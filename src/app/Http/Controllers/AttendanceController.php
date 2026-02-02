@@ -32,6 +32,9 @@ class AttendanceController extends Controller
         if (!$attendance) {
             return 'off';
         }
+        if (is_null($attendance->clock_in_at)) {
+            return 'off';
+        }
         if (!is_null($attendance->clock_out_at)) {
             return 'done';
         }
@@ -42,21 +45,26 @@ class AttendanceController extends Controller
         return 'working';
     }
 
+    private function findAttendanceForUpdate(int $userId, string $workDate): ?Attendance
+    {
+        return Attendance::query()
+            ->where('user_id', $userId)
+            ->where('work_date', $workDate)
+            ->lockForUpdate()
+            ->first();
+    }
+
     public function clockIn(Request $request)
     {
-        $user  = $request->user();
-        $today = now()->toDateString();
+        $userId = (int) $request->user()->id;
+        $today  = now()->toDateString();
 
-        $result = DB::transaction(function () use ($user, $today) {
-            $attendance = Attendance::query()
-                ->where('user_id', $user->id)
-                ->where('work_date', $today)
-                ->lockForUpdate()
-                ->first();
+        $result = DB::transaction(function () use ($userId, $today) {
+            $attendance = $this->findAttendanceForUpdate($userId, $today);
 
             if (!$attendance) {
                 $attendance = Attendance::create([
-                    'user_id'     => $user->id,
+                    'user_id'     => $userId,
                     'work_date'   => $today,
                     'clock_in_at' => now(),
                 ]);
@@ -81,25 +89,20 @@ class AttendanceController extends Controller
         return redirect()
             ->route('attendances.create')
             ->with('flash_message', match ($result['status']) {
-                'ok'                 => "出勤を記録しました：{$result['time']}",
-                'already_clocked_in' => "既に出勤済みです：{$result['time']}",
+                'ok'                  => "出勤を記録しました：{$result['time']}",
+                'already_clocked_in'  => "既に出勤済みです：{$result['time']}",
                 'already_clocked_out' => "既に退勤済みです：{$result['time']}",
-                default              => '処理に失敗しました。',
+                default               => '処理に失敗しました。',
             });
     }
 
-
     public function clockOut(Request $request)
     {
-        $user  = $request->user();
-        $today = now()->toDateString();
+        $userId = (int) $request->user()->id;
+        $today  = now()->toDateString();
 
-        $result = DB::transaction(function () use ($user, $today) {
-            $attendance = Attendance::query()
-                ->where('user_id', $user->id)
-                ->where('work_date', $today)
-                ->lockForUpdate()
-                ->first();
+        $result = DB::transaction(function () use ($userId, $today) {
+            $attendance = $this->findAttendanceForUpdate($userId, $today);
 
             if (!$attendance || is_null($attendance->clock_in_at)) {
                 return ['status' => 'no_clock_in'];
@@ -134,19 +137,13 @@ class AttendanceController extends Controller
             });
     }
 
-
-
     public function breakIn(Request $request)
     {
-        $user  = $request->user();
-        $today = now()->toDateString();
+        $userId = (int) $request->user()->id;
+        $today  = now()->toDateString();
 
-        $result = DB::transaction(function () use ($user, $today) {
-            $attendance = Attendance::query()
-                ->where('user_id', $user->id)
-                ->where('work_date', $today)
-                ->lockForUpdate()
-                ->first();
+        $result = DB::transaction(function () use ($userId, $today) {
+            $attendance = $this->findAttendanceForUpdate($userId, $today);
 
             if (!$attendance || is_null($attendance->clock_in_at)) {
                 return ['status' => 'no_clock_in'];
@@ -185,15 +182,11 @@ class AttendanceController extends Controller
 
     public function breakOut(Request $request)
     {
-        $user  = $request->user();
-        $today = now()->toDateString();
+        $userId = (int) $request->user()->id;
+        $today  = now()->toDateString();
 
-        $result = DB::transaction(function () use ($user, $today) {
-            $attendance = Attendance::query()
-                ->where('user_id', $user->id)
-                ->where('work_date', $today)
-                ->lockForUpdate()
-                ->first();
+        $result = DB::transaction(function () use ($userId, $today) {
+            $attendance = $this->findAttendanceForUpdate($userId, $today);
 
             if (!$attendance || is_null($attendance->clock_in_at)) {
                 return ['status' => 'no_clock_in'];

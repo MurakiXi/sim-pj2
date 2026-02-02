@@ -38,4 +38,6 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::post('attendance/clock-out', [AttendanceController::class, 'clockOut'])->name('attendances.clock_out');
     Route::post('attendance/break-in', [AttendanceController::class, 'breakIn'])->name('attendances.break_in');
     Route::post('attendance/break-out', [AttendanceController::class, 'breakOut'])->name('attendances.break_out');
+    Route::get('attendance/list', [AttendanceController::class, 'index'])->name('attendances.index');
+    Route::get('attendance/detail/{id}', [AttendanceController::class, 'show'])->whereNumber('id')->name('attendances.show');
 });
