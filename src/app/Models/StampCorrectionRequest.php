@@ -11,7 +11,19 @@ class StampCorrectionRequest extends Model
 
     protected $fillable = [
         'attendance_id',
-        'user_id',
+        'requested_clock_in_at',
+        'requested_clock_out_at',
+        'requested_note',
+        'requested_breaks',
+        'approved_by',
+        'approved_at',
+    ];
+
+    protected $casts = [
+        'requested_clock_in_at'  => 'datetime',
+        'requested_clock_out_at' => 'datetime',
+        'requested_breaks'       => 'array',
+        'approved_at'            => 'datetime',
     ];
 
     public function attendance()
@@ -19,13 +31,8 @@ class StampCorrectionRequest extends Model
         return $this->belongsTo(Attendance::class);
     }
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
     public function admin()
     {
-        return $this->belongsTo(Admin::class, 'admin_id');
+        return $this->belongsTo(Admin::class, 'approved_by');
     }
 }
