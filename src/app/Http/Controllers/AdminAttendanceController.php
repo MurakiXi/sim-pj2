@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class AttendanceStampController extends Controller
+class AdminAttendanceController extends Controller
 {
     //
     public function create()
