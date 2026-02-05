@@ -12,7 +12,7 @@
     <h1>ログイン</h1>
 </div>
 
-<form action="{{ route('login') }}" class="auth__login-form" method="post" novalidate>
+<form action="{{ route('admin.login.store') }}" method="post" novalidate>
     @csrf
     <div class="auth__login-inner">
         <label class="auth__login-label" for="email">メールアドレス</label>

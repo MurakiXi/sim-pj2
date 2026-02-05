@@ -341,7 +341,6 @@ class AttendanceController extends Controller
                 'requested_clock_out_at'  => $requestedClockOut,
                 'requested_note'          => $data['note'],
                 'requested_breaks'        => empty($requestedBreaks) ? null : $requestedBreaks,
-                // status は default(awaiting_approval) に任せてOK
             ]);
         });
 
