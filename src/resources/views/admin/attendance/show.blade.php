@@ -32,12 +32,12 @@ t@extends('layouts.app')
             <th class="show__table-header">出勤・退勤</th>
             <td class="show__table-data">
                 <input type="time" name="clock_in_at"
-                    value="{{ old('clock_in_at', $attendance->clock_in_at?->format('H:i') ?? '') }}">
+                    value="{{ old('clock_in_at', $attendance->clock_in_at?->format('H:i') ?? '') }}" @disabled($hasAwaitingApproval)>
             </td>
             <td class="show__table-wave">〜</td>
             <td class="show__table-data">
                 <input type="time" name="clock_out_at"
-                    value="{{ old('clock_out_at', $attendance->clock_out_at?->format('H:i') ?? '') }}">
+                    value="{{ old('clock_out_at', $attendance->clock_out_at?->format('H:i') ?? '') }}" @disabled($hasAwaitingApproval)>
             </td>
             <td class="show__table-data">
                 @if($errors->has('clock_in_at') || $errors->has('clock_out_at'))
@@ -57,13 +57,13 @@ t@extends('layouts.app')
             <td class="show__table-data">
                 <input type="time"
                     name="breaks[{{ $loop->index }}][break_in_at]"
-                    value="{{ old("breaks.$loop->index.break_in_at", $break->break_in_at?->format('H:i') ?? '') }}">
+                    value="{{ old("breaks.$loop->index.break_in_at", $break->break_in_at?->format('H:i') ?? '') }}" @disabled($hasAwaitingApproval)>
             </td>
             <td class="show__table-wave">〜</td>
             <td class="show__table-data">
                 <input type="time"
                     name="breaks[{{ $loop->index }}][break_out_at]"
-                    value="{{ old("breaks.$loop->index.break_out_at", $break->break_out_at?->format('H:i') ?? '') }}">
+                    value="{{ old("breaks.$loop->index.break_out_at", $break->break_out_at?->format('H:i') ?? '') }}" @disabled($hasAwaitingApproval)>
             </td>
             <td class="show__table-data">
                 @if(
@@ -82,7 +82,7 @@ t@extends('layouts.app')
         <tr class="show__table-row">
             <th class="show__table-header">備考</th>
             <td class="show__table-data" colspan="3">
-                <textarea name="note" class="show__table-note">{{ old('note', $attendance->note) }}</textarea>
+                <textarea name="note" class="show__table-note" @disabled($hasAwaitingApproval)>{{ old('note', $attendance->note) }}</textarea>
             </td>
             <td class="show__table-data">
                 @error("note")
@@ -93,8 +93,13 @@ t@extends('layouts.app')
     </table>
 
     <div class="show__form-button">
+        @if($hasAwaitingApproval)
+        <p class="show__form-button-message">※承認待ちのため修正はできません。</p>
+        @else
         <button type="submit" class="show__form-button-submit">修正</button>
+        @endif
     </div>
+
 </form>
 
 @endsection

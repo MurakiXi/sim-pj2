@@ -90,7 +90,6 @@ class AdminAttendanceController extends Controller
     {
         $data = $request->validated();
 
-        try {
             DB::transaction(function () use ($id, $data) {
 
                 $attendance = Attendance::whereKey($id)->lockForUpdate()->firstOrFail();
@@ -104,9 +103,9 @@ class AdminAttendanceController extends Controller
                     ]);
                 }
 
-                $workDate = $attendance->work_date->copy()->startOfDay();
+            $workDate = Carbon::parse($attendance->work_date)->startOfDay();
 
-                $clockIn  = $workDate->copy()->setTimeFromTimeString($data['clock_in_at']);
+            $clockIn  = $workDate->copy()->setTimeFromTimeString($data['clock_in_at']);
                 $clockOut = $workDate->copy()->setTimeFromTimeString($data['clock_out_at']);
 
                 $breaks = collect($data['breaks'] ?? [])
@@ -129,8 +128,7 @@ class AdminAttendanceController extends Controller
                     $attendance->breakTimes()->createMany($breaks);
                 }
             });
-        } catch (ValidationException $e) {
-            throw $e;
+
         }
 
         return redirect()
