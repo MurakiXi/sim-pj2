@@ -72,12 +72,17 @@ class AdminAttendanceController extends Controller
             $breakRows->push(new BreakTime());
         }
 
+        $hasAwaitingApproval = $attendance->stampCorrectionRequests()
+            ->where('status', 'awaiting_approval')
+            ->exists();
+
         return view('admin.attendance.show', [
             'attendance' => $attendance,
             'user'       => $attendance->user,
             'yearLabel'  => $workDate->format('Y年'),
             'mdLabel'    => $workDate->format('n月j日'),
             'breakRows'  => $breakRows,
+            'hasAwaitingApproval' => $hasAwaitingApproval,
         ]);
     }
 
