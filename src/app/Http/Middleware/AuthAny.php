@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Auth;
 class AuthAny
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> feature/correction
     /**
      * Handle an incoming request.
      *
@@ -16,6 +19,9 @@ class AuthAny
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
+<<<<<<< HEAD
+=======
+>>>>>>> feature/correction
 =======
 >>>>>>> feature/correction
     public function handle(Request $request, Closure $next)
