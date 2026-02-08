@@ -34,6 +34,19 @@ Route::get('/stamp_correction_request/list', [StampCorrectionController::class, 
     ->middleware(['auth.any'])
     ->name('stamp_correction_request.list');
 
+Route::prefix('admin')->name('admin.')->middleware(['fortify.admin'])->group(
+    function () {
+        Route::middleware('guest:admin')->group(function () {
+            Route::get('/login',  [AuthenticatedSessionController::class, 'create'])->name('login');
+            Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.store');
+        });
+
+        Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
+            ->middleware('auth:admin')
+            ->name('logout');
+    }
+);
+
 Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(function () {
 
     Route::get('/attendance/list', [AdminAttendanceController::class, 'index'])
@@ -48,13 +61,13 @@ Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(functi
         ->name('attendances.update');
 
     Route::get('/stamp_correction_request/list', [RequestApproveController::class, 'index'])
-        ->name('admin.requests.index');
+        ->name('requests.index');
 
     Route::get('/stamp_correction_request/{id}', [RequestApproveController::class, 'show'])
         ->whereNumber('id')
-        ->name('admin.requests.show');
+        ->name('requests.show');
 
     Route::patch('/stamp_correction_request/approve/{id}', [RequestApproveController::class, 'approve'])
         ->whereNumber('id')
-        ->name('admin.requests.approve');
+        ->name('requests.approve');
 });
