@@ -17,6 +17,7 @@ class StampCorrectionRequest extends Model
         'requested_breaks',
         'approved_by',
         'approved_at',
+        'status',
     ];
 
     protected $casts = [

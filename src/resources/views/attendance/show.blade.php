@@ -37,6 +37,13 @@
             <td class="show__table-data">
                 <input type="time" name="clock_out_at" value="{{ $attendance->clock_out_at?->format('H:i') ?? '' }}">
             </td>
+            <td class="show__table-data">
+                @if($errors->has('clock_in_at') || $errors->has('clock_out_at'))
+                <p class="form__error">
+                    {{ $errors->first('clock_in_at') ?: $errors->first('clock_out_at') }}
+                </p>
+                @endif
+            </td>
         </tr>
 
         @foreach($breakRows as $break)
@@ -55,6 +62,17 @@
                     name="breaks[{{ $loop->index }}][break_out_at]"
                     value="{{ $break->break_out_at?->format('H:i') ?? '' }}">
             </td>
+            <td class="show__table-data">
+                @if(
+                $errors->has("breaks.$loop->index.break_in_at") ||
+                $errors->has("breaks.$loop->index.break_out_at")
+                )
+                <p class="form__error">
+                    {{ $errors->first("breaks.$loop->index.break_in_at") ?: $errors->first("breaks.$loop->index.break_out_at") }}
+                </p>
+                @endif
+
+            </td>
         </tr>
         @endforeach
 
@@ -63,11 +81,20 @@
             <td class="show__table-data" colspan="3">
                 <textarea name="note" class="show__table-note">{{ old('note', $attendance->note) }}</textarea>
             </td>
+            <td class="show__table-data">
+                @error("note")
+                <p class="form__error">{{ $message }}</p>
+                @enderror
+            </td>
         </tr>
     </table>
 
     <div class="show__form-button">
+        @if($hasAwaitingApproval)
+        <p class="show__form-button-message">※承認待ちのため修正はできません。</p>
+        @else
         <button type="submit" class="show__form-button-submit">修正</button>
+        @endif
     </div>
 </form>
 

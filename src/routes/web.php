@@ -6,6 +6,7 @@ use App\Http\Controllers\StampCorrectionController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use App\Http\Controllers\AdminAttendanceController;
+use App\Http\Controllers\RequestApproveController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -33,19 +34,18 @@ Route::get('/stamp_correction_request/list', [StampCorrectionController::class, 
     ->middleware(['auth.any'])
     ->name('stamp_correction_request.list');
 
-Route::prefix('admin')->group(function () {
+Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(function () {
 
-    Route::get('/login', [AuthenticatedSessionController::class, 'create'])
-        ->middleware(['guest:admin', 'fortify.admin'])
-        ->name('admin.login');
+    Route::get('/stamp_correction_request/list', [RequestApproveController::class, 'index'])
+        ->name('admin.requests.index');
 
-    Route::post('/login', [AuthenticatedSessionController::class, 'store'])
-        ->middleware(['guest:admin', 'fortify.admin'])
-        ->name('admin.login.store');
+    Route::get('/stamp_correction_request/{id}', [RequestApproveController::class, 'show'])
+        ->whereNumber('id')
+        ->name('admin.requests.show');
 
-    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
-        ->middleware(['auth:admin', 'fortify.admin'])
-        ->name('admin.logout');
+    Route::patch('/stamp_correction_request/approve/{id}', [RequestApproveController::class, 'approve'])
+        ->whereNumber('id')
+        ->name('admin.requests.approve');
 
     Route::get('/attendance/list', [AdminAttendanceController::class, 'index'])
         ->middleware(['auth:admin'])

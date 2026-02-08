@@ -279,6 +279,13 @@ class AttendanceController extends Controller
         // 休憩回数分 + 追加1行
         $breakRows = $attendance->breakTimes->concat([new BreakTime()]);
 
+        $pending = $attendance->stampCorrectionRequests()
+            ->where('status', 'awaiting_approval')
+            ->latest('id')
+            ->first();
+
+        $hasAwaitingApproval = (bool) $pending;
+
         return view('attendance.show', [
             'user'       => $user,
             'attendance' => $attendance,
@@ -288,6 +295,7 @@ class AttendanceController extends Controller
             'clockOut'   => $attendance->clock_out_at?->format('H:i') ?? '',
             'breakRows'  => $breakRows,
             'note'       => $attendance->note ?? '',
+            'hasAwaitingApproval' => $hasAwaitingApproval
         ]);
     }
 
