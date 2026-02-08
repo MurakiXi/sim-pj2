@@ -67,22 +67,60 @@ class AdminAttendanceController extends Controller
             ? $attendance->work_date
             : Carbon::parse($attendance->work_date);
 
-        $breakRows = $attendance->breakTimes->values();
-        while ($breakRows->count() < 2) {
-            $breakRows->push(new BreakTime());
+        $pending = $attendance->stampCorrectionRequests()
+            ->where('status', 'awaiting_approval')
+            ->latest('id')
+            ->first();
+
+        $hasAwaitingApproval = (bool) $pending;
+
+        $displayClockInAt  = $pending?->requested_clock_in_at  ?? $attendance->clock_in_at;
+        $displayClockOutAt = $pending?->requested_clock_out_at ?? $attendance->clock_out_at;
+        $displayNote       = $pending?->requested_note         ?? $attendance->note;
+
+        if ($pending) {
+            $breakRows = collect($pending->requested_breaks ?? [])
+                ->map(fn($b) => (object) [
+                    'break_in_at'  => Carbon::parse($b['break_in_at']),
+                    'break_out_at' => Carbon::parse($b['break_out_at']),
+                ])
+                ->values();
+        } else {
+            $breakRows = $attendance->breakTimes
+                ->map(fn($bt) => (object) [
+                    'break_in_at'  => $bt->break_in_at,
+                    'break_out_at' => $bt->break_out_at,
+                ])
+                ->values();
         }
 
-        $hasAwaitingApproval = $attendance->stampCorrectionRequests()
-            ->where('status', 'awaiting_approval')
-            ->exists();
+        while ($breakRows->count() < 2) {
+            $breakRows->push((object) ['break_in_at' => null, 'break_out_at' => null]);
+        }
+
+        $latestRequest = $attendance->stampCorrectionRequests()
+            ->latest('id')
+            ->first();
+
+        $canApprove = $latestRequest && $latestRequest->status === 'awaiting_approval';
+        $isApproved = $latestRequest && $latestRequest->status === 'approved';
 
         return view('admin.attendance.show', [
             'attendance' => $attendance,
             'user'       => $attendance->user,
             'yearLabel'  => $workDate->format('Y年'),
             'mdLabel'    => $workDate->format('n月j日'),
-            'breakRows'  => $breakRows,
+
             'hasAwaitingApproval' => $hasAwaitingApproval,
+            'pendingAwaitingApproval' => $pending,
+            'latestRequest' => $latestRequest,
+            'canApprove' => $canApprove,
+            'isApproved' => $isApproved,
+
+            'displayClockInAt'  => $displayClockInAt,
+            'displayClockOutAt' => $displayClockOutAt,
+            'displayNote'       => $displayNote,
+            'breakRows'         => $breakRows,
         ]);
     }
 
@@ -90,49 +128,89 @@ class AdminAttendanceController extends Controller
     {
         $data = $request->validated();
 
-            DB::transaction(function () use ($id, $data) {
+        DB::transaction(function () use ($id, $data) {
 
-                $attendance = Attendance::whereKey($id)->lockForUpdate()->firstOrFail();
+            $attendance = Attendance::whereKey($id)->lockForUpdate()->firstOrFail();
 
-                if ($attendance->stampCorrectionRequests()
-                    ->where('status', 'awaiting_approval')
-                    ->exists()
-                ) {
-                    throw ValidationException::withMessages([
-                        'status' => '承認待ちのため修正はできません。',
-                    ]);
-                }
+            if ($attendance->stampCorrectionRequests()
+                ->where('status', 'awaiting_approval')
+                ->exists()
+            ) {
+                throw ValidationException::withMessages([
+                    'status' => '承認待ちのため修正はできません。',
+                ]);
+            }
 
             $workDate = Carbon::parse($attendance->work_date)->startOfDay();
 
             $clockIn  = $workDate->copy()->setTimeFromTimeString($data['clock_in_at']);
-                $clockOut = $workDate->copy()->setTimeFromTimeString($data['clock_out_at']);
+            $clockOut = $workDate->copy()->setTimeFromTimeString($data['clock_out_at']);
 
-                $breaks = collect($data['breaks'] ?? [])
-                    ->filter(fn($b) => filled($b['break_in_at'] ?? null) && filled($b['break_out_at'] ?? null))
-                    ->map(fn($b) => [
-                        'break_in_at'  => $workDate->copy()->setTimeFromTimeString($b['break_in_at']),
-                        'break_out_at' => $workDate->copy()->setTimeFromTimeString($b['break_out_at']),
-                    ])
-                    ->values()
-                    ->all();
+            $breaks = collect($data['breaks'] ?? [])
+                ->filter(fn($b) => filled($b['break_in_at'] ?? null) && filled($b['break_out_at'] ?? null))
+                ->map(fn($b) => [
+                    'break_in_at'  => $workDate->copy()->setTimeFromTimeString($b['break_in_at']),
+                    'break_out_at' => $workDate->copy()->setTimeFromTimeString($b['break_out_at']),
+                ])
+                ->values()
+                ->all();
 
-                $attendance->update([
-                    'clock_in_at'  => $clockIn,
-                    'clock_out_at' => $clockOut,
-                    'note'         => $data['note'],
-                ]);
+            $attendance->update([
+                'clock_in_at'  => $clockIn,
+                'clock_out_at' => $clockOut,
+                'note'         => $data['note'],
+            ]);
 
-                $attendance->breakTimes()->delete();
-                if (!empty($breaks)) {
-                    $attendance->breakTimes()->createMany($breaks);
-                }
-            });
-
-        }
+            $attendance->breakTimes()->delete();
+            if (!empty($breaks)) {
+                $attendance->breakTimes()->createMany($breaks);
+            }
+        });
 
         return redirect()
             ->route('admin.attendances.show', $id)
             ->with('flash_message', '修正を反映しました');
+    }
+
+    public function approve(int $id)
+    {
+        DB::transaction(function () use ($id) {
+
+            $scr = StampCorrectionRequest::whereKey($id)->lockForUpdate()->firstOrFail();
+
+            if ($scr->status !== 'awaiting_approval') {
+                throw ValidationException::withMessages(['status' => '承認待ちではありません。']);
+            }
+
+            $attendance = Attendance::whereKey($scr->attendance_id)->lockForUpdate()->firstOrFail();
+
+            $workDate = Carbon::parse($attendance->work_date)->startOfDay();
+
+            $attendance->update([
+                'clock_in_at'  => $scr->requested_clock_in_at,
+                'clock_out_at' => $scr->requested_clock_out_at,
+                'note'         => $scr->requested_note,
+            ]);
+
+            $breaks = collect($scr->requested_breaks ?? [])
+                ->map(fn($b) => [
+                    'break_in_at'  => Carbon::parse($b['break_in_at']),
+                    'break_out_at' => Carbon::parse($b['break_out_at']),
+                ])
+                ->values()
+                ->all();
+
+            $attendance->breakTimes()->delete();
+            if (!empty($breaks)) {
+                $attendance->breakTimes()->createMany($breaks);
+            }
+
+            $scr->update([
+                'status'      => 'approved',
+                'approved_at' => now(),
+            ]);
+        });
+
+        return redirect()->back()->with('flash_message', '承認しました');
     }
 }

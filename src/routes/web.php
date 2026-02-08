@@ -6,6 +6,7 @@ use App\Http\Controllers\StampCorrectionController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use App\Http\Controllers\AdminAttendanceController;
+use App\Http\Controllers\RequestApproveController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -33,21 +34,27 @@ Route::get('/stamp_correction_request/list', [StampCorrectionController::class, 
     ->middleware(['auth.any'])
     ->name('stamp_correction_request.list');
 
-Route::prefix('admin')->group(function () {
-
-    Route::get('/login', [AuthenticatedSessionController::class, 'create'])
-        ->middleware(['guest:admin', 'fortify.admin'])
-        ->name('admin.login');
-
-    Route::post('/login', [AuthenticatedSessionController::class, 'store'])
-        ->middleware(['guest:admin', 'fortify.admin'])
-        ->name('admin.login.store');
-
-    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
-        ->middleware(['auth:admin', 'fortify.admin'])
-        ->name('admin.logout');
+Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(function () {
 
     Route::get('/attendance/list', [AdminAttendanceController::class, 'index'])
-        ->middleware(['auth:admin'])
-        ->name('admin.attendances.index');
+        ->name('attendances.index');
+
+    Route::get('/attendance/{id}', [AdminAttendanceController::class, 'show'])
+        ->whereNumber('id')
+        ->name('attendances.show');
+
+    Route::patch('/attendance/{id}', [AdminAttendanceController::class, 'update'])
+        ->whereNumber('id')
+        ->name('attendances.update');
+
+    Route::get('/stamp_correction_request/list', [RequestApproveController::class, 'index'])
+        ->name('admin.requests.index');
+
+    Route::get('/stamp_correction_request/{id}', [RequestApproveController::class, 'show'])
+        ->whereNumber('id')
+        ->name('admin.requests.show');
+
+    Route::patch('/stamp_correction_request/approve/{id}', [RequestApproveController::class, 'approve'])
+        ->whereNumber('id')
+        ->name('admin.requests.approve');
 });

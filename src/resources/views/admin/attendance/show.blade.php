@@ -1,4 +1,4 @@
-t@extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', '管理勤怠詳細')
 
@@ -93,11 +93,7 @@ t@extends('layouts.app')
     </table>
 
     <div class="show__form-button">
-        @if($hasAwaitingApproval)
-        <p class="show__form-button-message">※承認待ちのため修正はできません。</p>
-        @else
         <button type="submit" class="show__form-button-submit">修正</button>
-        @endif
     </div>
 
 </form>
