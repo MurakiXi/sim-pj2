@@ -34,40 +34,36 @@ Route::get('/stamp_correction_request/list', [StampCorrectionController::class, 
     ->middleware(['auth.any'])
     ->name('stamp_correction_request.list');
 
-Route::prefix('admin')->name('admin.')->middleware(['fortify.admin'])->group(
-    function () {
+Route::prefix('admin')
+    ->name('admin.')
+    ->middleware(['fortify.admin'])
+    ->group(function () {
+
         Route::middleware('guest:admin')->group(function () {
             Route::get('/login',  [AuthenticatedSessionController::class, 'create'])->name('login');
             Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.store');
         });
 
-        Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
-            ->middleware('auth:admin')
-            ->name('logout');
-    }
-);
+        Route::middleware('auth:admin')->group(function () {
 
-Route::prefix('admin')->middleware(['auth:admin'])->name('admin.')->group(function () {
+            Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
-    Route::get('/attendance/list', [AdminAttendanceController::class, 'index'])
-        ->name('attendances.index');
+            Route::get('/stamp_correction_request/list', [RequestApproveController::class, 'index'])
+                ->name('requests.index');
 
-    Route::get('/attendance/{id}', [AdminAttendanceController::class, 'show'])
-        ->whereNumber('id')
-        ->name('attendances.show');
+            Route::get('/stamp_correction_request/{id}', [RequestApproveController::class, 'show'])
+                ->whereNumber('id')
+                ->name('requests.show');
 
-    Route::patch('/attendance/{id}', [AdminAttendanceController::class, 'update'])
-        ->whereNumber('id')
-        ->name('attendances.update');
+            Route::patch('/stamp_correction_request/approve/{id}', [RequestApproveController::class, 'approve'])
+                ->whereNumber('id')
+                ->name('requests.approve');
 
-    Route::get('/stamp_correction_request/list', [RequestApproveController::class, 'index'])
-        ->name('requests.index');
+            Route::get('/attendance/list', [AdminAttendanceController::class, 'index'])
+                ->name('attendances.index');
 
-    Route::get('/stamp_correction_request/{id}', [RequestApproveController::class, 'show'])
-        ->whereNumber('id')
-        ->name('requests.show');
-
-    Route::patch('/stamp_correction_request/approve/{id}', [RequestApproveController::class, 'approve'])
-        ->whereNumber('id')
-        ->name('requests.approve');
-});
+            Route::get('/attendance/{id}', [AdminAttendanceController::class, 'show'])
+                ->whereNumber('id')
+                ->name('attendances.show');
+        });
+    });
