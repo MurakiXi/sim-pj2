@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use App\Http\Controllers\AdminAttendanceController;
 use App\Http\Controllers\RequestApproveController;
+use App\Http\Controllers\AdminStaffController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -30,46 +32,45 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::patch('/attendance/detail/{id}', [AttendanceController::class, 'update'])->whereNumber('id')->name('attendances.update');
 });
 
-Route::get('/stamp_correction_request/list', [StampCorrectionController::class, 'index'])
-    ->middleware(['auth.any'])
-    ->name('stamp_correction_request.list');
-
 Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::middleware(['guest:admin', 'fortify.admin'])->group(function () {
-        Route::get('/login', function () {
-            return view('admin.auth.login');
-        })->name('login');
-
-        Route::post('/login', [AuthenticatedSessionController::class, 'store'])
-            ->name('login.store');
+        Route::get('/login', fn() => view('admin.auth.login'))->name('login');
+        Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.store');
     });
 
     Route::middleware(['auth:admin', 'fortify.admin'])->group(function () {
-        Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
-            ->name('logout');
+        Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
-        // 既存の管理画面ルートはここへ移動
-        Route::get('/attendance/list', [AdminAttendanceController::class, 'index'])
-            ->name('attendances.index');
-
-        Route::get('/attendance/{id}', [AdminAttendanceController::class, 'show'])
-            ->whereNumber('id')
-            ->name('attendances.show');
-
-        Route::patch('/attendance/{id}', [AdminAttendanceController::class, 'update'])
-            ->whereNumber('id')
-            ->name('attendances.update');
-
-        Route::get('/stamp_correction_request/list', [RequestApproveController::class, 'index'])
-            ->name('requests.index');
-
-        Route::get('/stamp_correction_request/{id}', [RequestApproveController::class, 'show'])
-            ->whereNumber('id')
-            ->name('requests.show');
-
-        Route::patch('/stamp_correction_request/approve/{id}', [RequestApproveController::class, 'approve'])
-            ->whereNumber('id')
-            ->name('requests.approve');
+        Route::get('/attendance/list', [AdminAttendanceController::class, 'index'])->name('attendances.index');
+        Route::get('/attendance/{id}', [AdminAttendanceController::class, 'show'])->whereNumber('id')->name('attendances.show');
+        Route::patch('/attendance/{id}', [AdminAttendanceController::class, 'update'])->whereNumber('id')->name('attendances.update');
     });
+});
+
+Route::get('/stamp_correction_request/list', [StampCorrectionController::class, 'index'])
+    ->middleware(['auth.any'])
+    ->name('stamp_correction_requests.index');
+
+Route::prefix('admin')->name('admin.')->group(function () {
+
+    Route::middleware(['auth:admin', 'fortify.admin'])->group(function () {
+
+        Route::get('/staff/list', [AdminStaffController::class, 'index'])
+            ->name('staff.index');
+
+        Route::get('/attendance/staff/{user}', [AdminStaffController::class, 'attendanceIndex'])
+            ->whereNumber('user')
+            ->name('staff.attendances.index');
+    });
+});
+
+Route::middleware(['auth:admin', 'fortify.admin'])->group(function () {
+    Route::get('/stamp_correction_request/approve/{id}', [RequestApproveController::class, 'show'])
+        ->whereNumber('id')
+        ->name('admin.requests.show');
+
+    Route::patch('/stamp_correction_request/approve/{id}', [RequestApproveController::class, 'approve'])
+        ->whereNumber('id')
+        ->name('admin.requests.approve');
 });
