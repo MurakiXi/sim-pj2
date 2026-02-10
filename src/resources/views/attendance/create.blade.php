@@ -4,7 +4,7 @@
 @section('title', '勤怠登録')
 
 @section('css')
-<link rel="stylesheet" href="{{ asset('css/create.css') }}">
+<link rel="stylesheet" href="{{ asset('css/user-create.css') }}">
 @endsection
 
 @section('content')

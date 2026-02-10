@@ -3,7 +3,7 @@
 @section('title', '修正申請一覧')
 
 @section('css')
-<link rel="stylesheet" href="{{ asset('css/admin-request-index.css') }}">
+<link rel="stylesheet" href="{{ asset('css/user-request.css') }}">
 @endsection
 
 @section('content')
@@ -42,7 +42,7 @@
         <td class="index__table-item">{{ $req->requested_note }}</td>
         <td class="index__table-item">{{ optional($req->created_at)->format('Y/m/d') }}</td>
         <td class="index__table-item">
-            <a href="{{ route('admin.requests.show', $req->id) }}">詳細</a>
+            <a href="{{ route('attendances.show', $req->id) }}">詳細</a>
         </td>
     </tr>
     @endforeach
