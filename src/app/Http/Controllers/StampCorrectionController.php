@@ -34,7 +34,7 @@ class StampCorrectionController extends Controller
 
         return auth('admin')->check()
             ? view('admin.request.index', compact('requests', 'status'))
-            : view('stamp_correction_request.index', compact('requests', 'status'));
+            : view('attendance.request', compact('requests', 'status'));
     }
 
 
