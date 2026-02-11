@@ -3,8 +3,10 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\URL;
 
 class AuthAny
 {
@@ -19,21 +21,26 @@ class AuthAny
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-<<<<<<< HEAD
-=======
->>>>>>> feature/correction
-=======
->>>>>>> feature/correction
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next, ...$guards)
     {
-        if (Auth::guard('web')->check() || Auth::guard('admin')->check()) {
+        if (auth('admin')->check()) {
             return $next($request);
         }
 
-        if ($request->is('admin/*')) {
-            return redirect()->route('admin.login');
+        if (auth('web')->check()) {
+            $user = auth('web')->user();
+
+            if ($user instanceof MustVerifyEmail && ! $user->hasVerifiedEmail()) {
+                return $request->expectsJson()
+                    ? abort(403, 'Your email address is not verified.')
+                    : Redirect::guest(URL::route('verification.notice'));
+            }
+
+            return $next($request);
         }
 
-        return redirect()->route('login');
+        return $request->is('admin/*')
+            ? redirect()->route('admin.login')
+            : redirect()->route('login');
     }
 }

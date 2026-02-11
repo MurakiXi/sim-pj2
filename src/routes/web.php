@@ -62,6 +62,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/attendance/staff/{user}', [AdminStaffController::class, 'attendanceIndex'])
             ->whereNumber('user')
             ->name('staff.attendances.index');
+
+        Route::get('/attendance/staff/{user}/csv', [AdminStaffController::class, 'attendanceCsv'])
+            ->whereNumber('user')
+            ->name('staff.attendances.csv');
     });
 });
 

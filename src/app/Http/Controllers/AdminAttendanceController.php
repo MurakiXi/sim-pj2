@@ -46,7 +46,7 @@ class AdminAttendanceController extends Controller
             ];
         });
 
-        return view('admin.attendance.index', [
+        return view('admin.attendance.list', [
             'rows'      => $rows,
             'titleDate' => $day->format('Y年n月j日'),
             'dateLabel' => $day->format('Y/m/d'),
