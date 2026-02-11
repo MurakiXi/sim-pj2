@@ -10,10 +10,6 @@ use Illuminate\Support\Facades\URL;
 
 class AuthAny
 {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> feature/correction
     /**
      * Handle an incoming request.
      *
