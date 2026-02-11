@@ -56,6 +56,7 @@ return [
 
     'asset_url' => env('ASSET_URL', null),
 
+    'mailhog_url' => env('MAILHOG_URL', 'http://localhost:8025'),
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
