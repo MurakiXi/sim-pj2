@@ -44,13 +44,17 @@ class AttendanceRequest extends FormRequest
 
     public function withValidator($validator): void
     {
+
         $validator->after(function ($v) {
             $in  = $this->input('clock_in_at');
             $out = $this->input('clock_out_at');
-
+            $toMinutes = function (?string $t): ?int {
+                if (!$t) return null;
+                return ((int)substr($t, 0, 2)) * 60 + (int)substr($t, 3, 2);
+            };
 
             if ($in && $out && $in > $out) {
-                $v->errors()->add('clock_in_at', '出勤時間が不適切な値です');
+                $v->errors()->add('clock_in_at', '出勤時間もしくは退勤時間が不適切な値です');
             }
 
             foreach ((array)$this->input('breaks', []) as $i => $b) {
@@ -66,6 +70,19 @@ class AttendanceRequest extends FormRequest
 
                 if ($bin >= $bout) {
                     $v->errors()->add("breaks.$i.break_in_at", '休憩時間が不適切な値です');
+                    continue;
+                }
+
+                $outMin  = $toMinutes($out);
+                $binMin  = $toMinutes($bin);
+                $boutMin = $toMinutes($bout);
+
+                if ($outMin !== null && $boutMin !== null && $boutMin > $outMin) {
+                    $v->errors()->add("breaks.$i.break_out_at", '休憩時間もしくは退勤時間が不適切な値です');
+                }
+
+                if ($outMin !== null && $binMin !== null && $binMin > $outMin) {
+                    $v->errors()->add("breaks.$i.break_in_at", '休憩時間もしくは退勤時間が不適切な値です');
                 }
             }
         });

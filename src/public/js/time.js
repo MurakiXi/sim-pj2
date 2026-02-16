@@ -5,7 +5,7 @@
     if (!root || !dateEl || !timeEl) return;
 
     const serverNow = parseInt(root.dataset.serverNow, 10);
-    const offset = serverNow - Date.now(); // サーバ時刻に寄せる差分
+    const offset = serverNow - Date.now();
 
     const youbi = ['日', '月', '火', '水', '木', '金', '土'];
 
@@ -18,10 +18,11 @@
     };
 
     const formatTime = (d) => {
-        const h = d.getHours();
+        const hh = String(d.getHours()).padStart(2, '0');
         const mm = String(d.getMinutes()).padStart(2, '0');
-        return `${h}時${mm}分`;
+        return `${hh}:${mm}`;
     };
+
 
     let lastDateText = '';
 
