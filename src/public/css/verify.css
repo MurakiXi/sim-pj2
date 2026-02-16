@@ -1,0 +1,31 @@
+.verify__inner {
+    width: 50%;
+    margin: 100px auto;
+    text-align: center;
+}
+
+.verify__message {
+    font-weight: bold;
+}
+
+.verify__button {
+    background: #ddd;
+    font-weight: bold;
+    border: 1px solid;
+    border-radius: 5px;
+    width: 180px;
+    margin: 50px auto;
+    padding: 10px;
+}
+
+.verify__button a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.verify__resend-mail {
+    background: #fff;
+    border: none;
+    color: #0d71e4;
+    font-size: 14px;
+}

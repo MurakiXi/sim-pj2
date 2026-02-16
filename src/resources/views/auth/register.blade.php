@@ -4,13 +4,13 @@
 @section('title', '会員登録')
 
 @section('css')
-<link rel="stylesheet" href="{{ asset('css/user-register.css') }}">
+<link rel="stylesheet" href="{{ asset('css/register.css') }}">
 @endsection
 
 @section('content')
 
 <div class="auth__register-title">
-    <h1>会員登録</h1>
+    <h1 class="auth__register-title-text">会員登録</h1>
 </div>
 
 <form action="{{ route('register') }}" class="auth__register-form" method="post">
@@ -37,7 +37,7 @@
         @error('password')
         <p class="auth__error">{{ $message }}</p>
         @enderror
-        <label class="auth__register-label">確認用パスワード</label>
+        <label class="auth__register-label">パスワード確認</label>
         <div class="auth__register-item">
             <input class="auth__register-input" type="password" name="password_confirmation">
         </div>

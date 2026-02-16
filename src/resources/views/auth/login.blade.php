@@ -9,7 +9,7 @@
 @section('content')
 
 <div class="auth__login-title">
-    <h1>ログイン</h1>
+    <h1 class=auth__login-title-text>ログイン</h1>
 </div>
 
 <form action="{{ route('login') }}" class="auth__login-form" method="post" novalidate>

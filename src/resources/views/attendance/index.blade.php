@@ -22,7 +22,7 @@
 
 
 <table class="index__table">
-    <tr class="index__table-row">
+    <tr class="index__table-row-header">
         <th class="index__table-header">日付</th>
         <th class="index__table-header">出勤</th>
         <th class="index__table-header">退勤</th>
@@ -39,7 +39,7 @@
         <td class="index__table-item">{{ $row['work'] }}</td>
         <td class="index__table-item">
             @if($row['id'])
-            <a href="{{ route('attendances.show', $row['id']) }}">詳細</a>
+            <a class="index__table-item-detail" href="{{ route('attendances.show', $row['id']) }}">詳細</a>
             @endif
         </td>
     </tr>

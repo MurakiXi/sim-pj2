@@ -9,10 +9,10 @@
 @section('content')
 
 <div class="auth__login-title">
-    <h1>ログイン</h1>
+    <h1 class=auth__login-title-text>管理者ログイン</h1>
 </div>
 
-<form action="{{ route('admin.login.store') }}" method="post" novalidate>
+<form action="{{ route('admin.login.store') }}" class="auth__login-form" method="post" novalidate>
     @csrf
     <div class="auth__login-inner">
         <label class="auth__login-label" for="email">メールアドレス</label>

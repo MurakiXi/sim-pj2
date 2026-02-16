@@ -1,0 +1,69 @@
+.flash-message {
+    text-align: center;
+    font-size: 18px;
+}
+
+.create__work-status {
+    background: #d5d5d5;
+    color: #444;
+    font-size: 14px;
+    width: 50px;
+    padding: 5px 10px;
+    border-radius: 100px;
+    text-align: center;
+    margin: 150px auto 25px;
+}
+
+.create__date-label {
+    font-size: 32px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.create__time-label {
+    font-size: 60px;
+    font-weight: bolder;
+    text-align: center;
+}
+
+.create__btn-row {
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+    gap: 50px;
+}
+
+.create__form {
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+}
+
+.create__button {
+    font-weight: bold;
+    background: #fff;
+    border-radius: 15px;
+    border: none;
+    width: 150px;
+    font-size: 24px;
+    padding: 10px;
+    margin: 0 25px;
+}
+
+.create__button-clock {
+    font-weight: bold;
+    background: #000;
+    color: #fff;
+    border-radius: 15px;
+    border: none;
+    width: 150px;
+    font-size: 24px;
+    padding: 10px;
+}
+
+.create__message {
+    margin-top: 50px;
+    font-weight: bold;
+    font-size: 20px;
+    text-align: center;
+}

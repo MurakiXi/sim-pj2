@@ -13,32 +13,28 @@
 use Illuminate\Support\Facades\Auth;
 
 $isAdmin = Auth::guard('admin')->check();
-$isUser = Auth::guard('web')->check(); // または Auth::check()
+$isUser = Auth::guard('web')->check();
 
-// ナビ非表示にしたい画面（必要に応じて追加）
 $hideNav = request()->routeIs([
 'login',
 'admin.login',
 'verification.notice',
 ]);
 
-// 「退勤後」判定：勤怠登録画面で $workStatus が渡っている前提
 $isAfterClockOut = $isUser && (($workStatus ?? null) === 'done');
 
-// ロゴの遷移先（管理者と一般で分ける）
 $logoRoute = $isAdmin
-? route('admin.attendances.index') // 実名に合わせて修正
+? route('admin.attendances.index')
 : route('attendances.create');
 
-// ナビ項目組み立て
 $navItems = [];
 
 if (!$hideNav && ($isAdmin || $isUser)) {
 if ($isAdmin) {
 $navItems = [
-['label' => '勤怠一覧', 'href' => route('admin.attendances.index')], // /admin/attendance/list
-['label' => 'スタッフ一覧','href' => route('admin.staff.index')], // /admin/staff/list
-['label' => '申請一覧', 'href' => route('stamp_correction_requests.index')], // /stamp_correction_request/list（共通想定）
+['label' => '勤怠一覧', 'href' => route('admin.attendances.index')],
+['label' => 'スタッフ一覧','href' => route('admin.staff.index')],
+['label' => '申請一覧', 'href' => route('stamp_correction_requests.index')],
 ];
 $logoutRoute = route('admin.logout');
 } else {
