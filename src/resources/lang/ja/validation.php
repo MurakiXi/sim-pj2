@@ -170,5 +170,12 @@ return [
         'email'                 => 'メールアドレス',
         'password'              => 'パスワード',
         'password_confirmation' => 'パスワード（確認）',
+        'clock_in_at'  => '出勤時間',
+        'clock_out_at' => '退勤時間',
+        'note'         => '備考',
+        'breaks.*.break_in_at'  => '休憩開始',
+        'breaks.*.break_out_at' => '休憩終了',
+
     ],
+
 ];

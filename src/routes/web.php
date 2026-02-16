@@ -8,6 +8,11 @@ use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use App\Http\Controllers\AdminAttendanceController;
 use App\Http\Controllers\RequestApproveController;
 use App\Http\Controllers\AdminStaffController;
+use App\Http\Requests\RegisterRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Auth\Events\Registered;
+use Laravel\Fortify\Contracts\CreatesNewUsers;
+use Laravel\Fortify\Contracts\RegisterResponse;
 
 /*
 |--------------------------------------------------------------------------
@@ -77,4 +82,21 @@ Route::middleware(['auth:admin', 'fortify.admin'])->group(function () {
     Route::patch('/stamp_correction_request/approve/{id}', [RequestApproveController::class, 'approve'])
         ->whereNumber('id')
         ->name('admin.requests.approve');
+});
+
+Route::middleware('guest')->group(function () {
+    Route::get('/register', fn() => view('auth.register'))->name('register');
+
+    Route::post('/register', function (
+        RegisterRequest $request,
+        CreatesNewUsers $creator
+    ) {
+        $user = $creator->create($request->validated());
+
+        event(new Registered($user));
+
+        Auth::login($user);
+
+        return app(RegisterResponse::class);
+    })->name('register');
 });

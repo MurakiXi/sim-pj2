@@ -42,7 +42,7 @@
         <td class="index__table-item">{{ $req->requested_note }}</td>
         <td class="index__table-item">{{ optional($req->created_at)->format('Y/m/d') }}</td>
         <td class="index__table-item">
-            <a href="{{ route('attendances.show', $req->id) }}">詳細</a>
+            <a href="{{ route('attendances.show', $req->attendance->id) }}">詳細</a>
         </td>
     </tr>
     @endforeach
