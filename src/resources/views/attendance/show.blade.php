@@ -14,11 +14,15 @@
     @csrf
     @method('PATCH')
     <table class="show__table">
+        <colgroup>
+            <col class="show__col-header">
+            <col class="show__col-from">
+            <col class="show__col-wave">
+            <col class="show__col-to">
+        </colgroup>
         <tr class="show__table-row">
             <th class="show__table-header">名前</th>
-            <td class="show__table-data" colspan="3">
-                {{ $user->name }}
-            </td>
+            <td class="show__table-data show__table-data--wide" colspan="3">{{ $user->name }}</td>
         </tr>
 
         <tr class="show__table-row">
@@ -30,21 +34,30 @@
 
         <tr class="show__table-row">
             <th class="show__table-header">出勤・退勤</th>
-            <td class="show__table-data">
-                <input type="time" name="clock_in_at" value="{{ $attendance->clock_in_at?->format('H:i') ?? '' }}">
+
+            <td class="show__table-data show__table-data--field">
+                <input type="text" class="show__table-input" name="clock_in_at"
+                    value="{{ old('clock_in_at', $attendance->clock_in_at?->format('H:i') ?? '') }}"
+                    @disabled($hasAwaitingApproval)>
+
+                @error('clock_in_at')
+                <p class="form__error">{{ $message }}</p>
+                @enderror
             </td>
+
             <td class="show__table-wave">〜</td>
-            <td class="show__table-data">
-                <input type="time" name="clock_out_at" value="{{ $attendance->clock_out_at?->format('H:i') ?? '' }}">
-            </td>
-            <td class="show__table-data">
-                @if($errors->has('clock_in_at') || $errors->has('clock_out_at'))
-                <p class="form__error">
-                    {{ $errors->first('clock_in_at') ?: $errors->first('clock_out_at') }}
-                </p>
-                @endif
+
+            <td class="show__table-data show__table-data--field">
+                <input type="text" class="show__table-input" name="clock_out_at"
+                    value="{{ old('clock_out_at', $attendance->clock_out_at?->format('H:i') ?? '') }}"
+                    @disabled($hasAwaitingApproval)>
+
+                @error('clock_out_at')
+                <p class="form__error">{{ $message }}</p>
+                @enderror
             </td>
         </tr>
+
 
         @foreach($breakRows as $break)
         <tr class="show__table-row">
@@ -52,41 +65,33 @@
                 {{ $loop->first ? '休憩' : '休憩'.$loop->iteration }}
             </th>
             <td class="show__table-data">
-                <input type="time"
+                <input type="text" class="show__table-input"
                     name="breaks[{{ $loop->index }}][break_in_at]"
-                    value="{{ $break->break_in_at?->format('H:i') ?? '' }}">
+                    value="{{ old("breaks.$loop->index.break_in_at", $break->break_in_at?->format('H:i') ?? '') }}" @disabled($hasAwaitingApproval)>
             </td>
             <td class="show__table-wave">〜</td>
             <td class="show__table-data">
-                <input type="time"
+                <input type="text" class="show__table-input"
                     name="breaks[{{ $loop->index }}][break_out_at]"
-                    value="{{ $break->break_out_at?->format('H:i') ?? '' }}">
+                    value="{{ old("breaks.$loop->index.break_out_at", $break->break_out_at?->format('H:i') ?? '') }}" @disabled($hasAwaitingApproval)>
             </td>
-            <td class="show__table-data">
-                @if(
-                $errors->has("breaks.$loop->index.break_in_at") ||
-                $errors->has("breaks.$loop->index.break_out_at")
-                )
-                <p class="form__error">
-                    {{ $errors->first("breaks.$loop->index.break_in_at") ?: $errors->first("breaks.$loop->index.break_out_at") }}
-                </p>
-                @endif
-
-            </td>
+            @error("breaks.$loop->index.break_in_at")
+            <p class="form__error">{{ $message }}</p>
+            @enderror
         </tr>
         @endforeach
 
         <tr class="show__table-row">
             <th class="show__table-header">備考</th>
-            <td class="show__table-data" colspan="3">
-                <textarea name="note" class="show__table-note">{{ old('note', $attendance->note) }}</textarea>
-            </td>
-            <td class="show__table-data">
-                @error("note")
+            <td class="show__table-data show__table-data--note" colspan="3">
+                <textarea name="note" class="show__table-note" @disabled($hasAwaitingApproval)>{{ old('note', $attendance->note) }}</textarea>
+
+                @error('note')
                 <p class="form__error">{{ $message }}</p>
                 @enderror
             </td>
         </tr>
+
     </table>
 
     <div class="show__form-button">

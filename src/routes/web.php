@@ -35,6 +35,8 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::get('/attendance/list', [AttendanceController::class, 'index'])->name('attendances.index');
     Route::get('/attendance/detail/{id}', [AttendanceController::class, 'show'])->whereNumber('id')->name('attendances.show');
     Route::patch('/attendance/detail/{id}', [AttendanceController::class, 'update'])->whereNumber('id')->name('attendances.update');
+    Route::get('/attendance/detail', [AttendanceController::class, 'showByDate'])
+        ->name('attendances.show_by_date');
 });
 
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -67,6 +69,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/attendance/staff/{user}', [AdminStaffController::class, 'attendanceIndex'])
             ->whereNumber('user')
             ->name('staff.attendances.index');
+
+        Route::get('/attendance/staff/{user}/detail', [AdminStaffController::class, 'attendanceShowByDate'])
+            ->whereNumber('user')
+            ->name('staff.attendances.show_by_date');
 
         Route::get('/attendance/staff/{user}/csv', [AdminStaffController::class, 'attendanceCsv'])
             ->whereNumber('user')

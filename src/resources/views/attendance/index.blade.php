@@ -14,12 +14,28 @@
     <a class="index__month-nav" href="{{ route('attendances.index', ['month' => $prevMonth]) }}">←前月</a>
 
     <div class="index__month-label">
-        {{ $monthLabel }}
+        <form method="GET" action="{{ route('attendances.index') }}" class="index__month-form">
+            <button type="button" id="month-picker-trigger" class="index__month-trigger" aria-label="月を選択">
+                <svg class="index__month-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M7 2v2M17 2v2M4 6h16M5 8h14v13H5z"
+                        fill="none" stroke="currentColor" stroke-width="2" />
+                </svg>
+            </button>
+
+            <input
+                type="month"
+                id="month-picker"
+                name="month"
+                value="{{ $monthValue }}"
+                class="index__month-input">
+
+            <span class="index__month-text">{{ $monthLabel }}</span>
+        </form>
     </div>
+
 
     <a class="index__month-nav" href="{{ route('attendances.index', ['month' => $nextMonth]) }}">翌月→</a>
 </div>
-
 
 <table class="index__table">
     <tr class="index__table-row-header">
@@ -38,13 +54,40 @@
         <td class="index__table-item">{{ $row['break'] }}</td>
         <td class="index__table-item">{{ $row['work'] }}</td>
         <td class="index__table-item">
-            @if($row['id'])
-            <a class="index__table-item-detail" href="{{ route('attendances.show', $row['id']) }}">詳細</a>
-            @endif
+            <a class="index__table-item-detail"
+                href="{{ $row['id']
+            ? route('attendances.show', $row['id'])
+            : route('attendances.show_by_date', ['date' => $row['work_date']]) }}">
+                詳細
+            </a>
         </td>
+
     </tr>
     @endforeach
-
 </table>
 
+@endsection
+
+@section('js')
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const input = document.getElementById('month-picker');
+        const trigger = document.getElementById('month-picker-trigger');
+        if (!input || !trigger) return;
+
+        trigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (typeof input.showPicker === 'function') {
+                input.showPicker();
+            } else {
+                input.focus();
+                input.click();
+            }
+        });
+
+        input.addEventListener('change', () => {
+            if (input.form) input.form.submit();
+        });
+    });
+</script>
 @endsection

@@ -1,6 +1,7 @@
 .flash-message {
     text-align: center;
-    font-size: 18px;
+    font-size: 24px;
+    font-weight: bold;
 }
 
 .create__work-status {

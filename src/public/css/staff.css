@@ -15,16 +15,16 @@
     margin: 0 auto;
 }
 
-.index__month-nav a {
+.index__date-nav a {
     color: inherit;
 }
 
-.index__month-nav {
+.index__date-nav {
     color: #666;
     padding: 10px 20px;
 }
 
-.index__month-label {
+.index__date-label {
     padding: 10px;
     font-weight: bold;
 }
@@ -43,17 +43,17 @@
 
 .index__table th:nth-child(1),
 .index__table td:nth-child(1) {
-    width: 120px;
+    width: 100px;
     text-align: left;
-    padding-left: 50px;
+    padding-left: 120px;
     white-space: nowrap;
 }
 
-.index__table th:nth-child(6),
-.index__table td:nth-child(6) {
-    width: 110px;
-    text-align: right;
-    padding-right: 80px;
+.index__table th:nth-child(3),
+.index__table td:nth-child(3) {
+    width: 100px;
+    text-align: centert;
+    padding-right: 100px;
     white-space: nowrap;
 }
 
@@ -101,13 +101,13 @@
     text-align: center;
 }
 
-.index__month-form {
+.index__date-form {
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.index__month-trigger {
+.index__date-trigger {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -118,48 +118,17 @@
     color: #666;
 }
 
-.index__month-trigger:focus-visible {
+.index__date-trigger:focus-visible {
     outline: 2px solid #999;
     outline-offset: 2px;
     border-radius: 4px;
 }
 
-.index__month-icon {
+.index__date-icon {
     width: 18px;
     height: 18px;
 }
 
-.index__month-text {
+.index__date-text {
     font-weight: bold;
-}
-
-.index__month-input {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
-
-.index__footer {
-    width: 800px;
-    text-align: right;
-    margin: 50px auto;
-}
-
-.index__csv-btn a {
-    color: inherit;
-}
-
-.index__csv-btn {
-    text-align: center;
-    color: #fff;
-    background: #000;
-    text-decoration: none;
-    padding: 5px 30px;
-    border-radius: 5px;
 }

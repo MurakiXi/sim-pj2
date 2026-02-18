@@ -3,7 +3,7 @@
 @section('title', 'スタッフ一覧')
 
 @section('css')
-<link rel="stylesheet" href="{{ asset('css/admin-staff.css') }}">
+<link rel="stylesheet" href="{{ asset('css/staff.css') }}">
 @endsection
 
 @section('content')
@@ -22,7 +22,7 @@
         <td class="index__table-item">{{ $user->name }}</td>
         <td class="index__table-item">{{ $user->email }}</td>
         <td class="index__table-item">
-            <a href="{{ route('admin.staff.attendances.index', ['user' => $user->id]) }}">詳細</a>
+            <a class="index__table-item-detail" href="{{ route('admin.staff.attendances.index', ['user' => $user->id]) }}">詳細</a>
         </td>
     </tr>
     @empty

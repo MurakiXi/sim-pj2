@@ -1,0 +1,136 @@
+.flash-message {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.show__title {
+    font-size: 24px;
+    font-weight: bold;
+    padding-left: 10px;
+    margin: 50px auto 25px;
+    width: 800px;
+}
+
+.show__table {
+    width: 800px;
+    background: #fff;
+    margin: 40px auto;
+    border-radius: 10px;
+    border-collapse: collapse;
+    border: none;
+    table-layout: fixed;
+    overflow: hidden;
+}
+
+.show__col-header {
+    width: 30%;
+}
+
+.show__col-from {
+    width: 20%;
+}
+
+.show__col-wave {
+    width: 10%;
+}
+
+.show__col-to {
+    width: 40%;
+}
+
+.show__table thead th {
+    border-bottom: 2px solid #ddd;
+}
+
+.show__table tbody tr:not(:last-child) td,
+.show__table tbody tr:not(:last-child) th {
+    border-bottom: 2px solid #ddd;
+}
+
+.show__table-item-detail a {
+    color: inherit;
+}
+
+.show__table-item-detail {
+    color: #000;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.show__table-header {
+    color: #666;
+    text-align: left;
+    padding-left: 60px;
+    font-weight: bold;
+}
+
+.show__table-row {
+    height: 75px;
+}
+
+.show__table-item {
+    text-align: center;
+    font-weight: bold;
+}
+
+.show__table-data,
+.show__table-wave {
+    text-align: center;
+    font-weight: bold;
+    padding: 0 8px;
+}
+
+.show__table-data--wide {
+    text-align: left;
+    padding-left: 55px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.show__table-data-note {
+    padding-right: 85px;
+}
+
+.show__table-note {
+    width: 85%;
+    height: 70px;
+    margin: 15px 0;
+    font-weight: bold;
+    border: 1px solid #ddd;
+    padding: 5px 10px;
+}
+
+.show__table-input {
+    font-weight: bold;
+    font-size: 18px;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    height: 25px;
+    width: 70px;
+}
+
+.show__form-button {
+    width: 800px;
+    height: 45px;
+    margin: 20px auto;
+    text-align: right;
+}
+
+.show__form-button-submit {
+    text-align: center;
+    background: #000;
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    width: 125px;
+    height: 100%;
+    border-radius: 5px;
+}
+
+.show__table td:last-child {
+    padding-right: 150px;
+
+}

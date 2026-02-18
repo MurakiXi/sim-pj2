@@ -251,6 +251,7 @@ class AttendanceController extends Controller
             $rows->push([
                 'id'         => $a?->id,
                 'date'       => $d->format('m/d'),
+                'work_date' => $d->toDateString(),
                 'weekday'    => ['日', '月', '火', '水', '木', '金', '土'][$d->dayOfWeek],
                 'clock_in'   => $a?->clock_in_at?->format('H:i') ?? '',
                 'clock_out'  => $a?->clock_out_at?->format('H:i') ?? '',
@@ -264,6 +265,7 @@ class AttendanceController extends Controller
             'monthLabel' => $current->format('Y/m'),
             'prevMonth'  => $current->copy()->subMonth()->format('Y-m'),
             'nextMonth'  => $current->copy()->addMonth()->format('Y-m'),
+            'monthValue' => $current->format('Y-m'),
         ]);
     }
 
@@ -276,7 +278,6 @@ class AttendanceController extends Controller
             ->where('user_id', $user->id)
             ->firstOrFail();
 
-        // 休憩回数分 + 追加1行
         $breakRows = $attendance->breakTimes->concat([new BreakTime()]);
 
         $pending = $attendance->stampCorrectionRequests()
@@ -299,6 +300,22 @@ class AttendanceController extends Controller
         ]);
     }
 
+    public function showByDate(Request $request)
+    {
+        $user = $request->user();
+        $date = (string) $request->query('date');
+
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+            abort(404);
+        }
+
+        $attendance = Attendance::firstOrCreate([
+            'user_id'   => $user->id,
+            'work_date' => $date,
+        ]);
+
+        return redirect()->route('attendances.show', $attendance->id);
+    }
 
     private function formatDuration(?int $seconds): string
     {

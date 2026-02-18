@@ -14,8 +14,25 @@
     <a class="index__date-nav" href="{{ route('admin.attendances.index', ['date' => $prevDate]) }}">←前日</a>
 
     <div class="index__date-label">
-        {{ $dateLabel }}
+        <form method="GET" action="{{ route('admin.attendances.index') }}" class="index__date-form">
+            <button type="button" id="date-picker-trigger" class="index__date-trigger" aria-label="日付を選択">
+                <svg class="index__date-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M7 2v2M17 2v2M4 6h16M5 8h14v13H5z"
+                        fill="none" stroke="currentColor" stroke-width="2" />
+                </svg>
+            </button>
+
+            <input
+                type="date"
+                id="date-picker"
+                name="date"
+                value="{{ $dateLabel }}"
+                class="index__date-input">
+
+            <span class="index__date-text">{{ $dateLabel }}</span>
+        </form>
     </div>
+
 
     <a class="index__date-nav" href="{{ route('admin.attendances.index', ['date' => $nextDate]) }}">翌日→</a>
 </div>
@@ -39,7 +56,7 @@
         <td class="index__table-item">{{ $row['work'] }}</td>
         <td class="index__table-item">
             @if($row['id'])
-            <a href="{{ route('admin.attendances.show', $row['id']) }}">詳細</a>
+            <a class="index__table-item-detail" href="{{ route('admin.attendances.show', $row['id']) }}">詳細</a>
             @else
 
             @endif
@@ -48,4 +65,28 @@
     @endforeach
 </table>
 
+@endsection
+
+@section('js')
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const input = document.getElementById('date-picker');
+        const trigger = document.getElementById('date-picker-trigger');
+        if (!input || !trigger) return;
+
+        trigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (typeof input.showPicker === 'function') {
+                input.showPicker();
+            } else {
+                input.focus();
+                input.click();
+            }
+        });
+
+        input.addEventListener('change', () => {
+            if (input.form) input.form.submit();
+        });
+    });
+</script>
 @endsection

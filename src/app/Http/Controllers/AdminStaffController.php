@@ -47,6 +47,7 @@ class AdminStaffController extends Controller
                 'id'         => $a?->id,
                 'date'       => $d->format('m/d'),
                 'weekday'    => ['日', '月', '火', '水', '木', '金', '土'][$d->dayOfWeek],
+                'work_date' => $d->toDateString(),
                 'clock_in'   => $a?->clock_in_at?->format('H:i') ?? '',
                 'clock_out'  => $a?->clock_out_at?->format('H:i') ?? '',
                 'break'      => ($a && $a->clock_out_at) ? $a->breakDurationLabel() : '',
@@ -62,7 +63,27 @@ class AdminStaffController extends Controller
             'prevMonth'  => $current->copy()->subMonth()->format('Y-m'),
             'nextMonth'  => $current->copy()->addMonth()->format('Y-m'),
             'currentMonth' => $current->format('Y-m'),
+            'monthValue' => $current->format('Y-m'),
         ]);
+    }
+
+
+    public function attendanceShowByDate(Request $request, User $user)
+    {
+        $dateParam = (string) $request->query('date');
+
+        try {
+            $day = Carbon::createFromFormat('Y-m-d', $dateParam)->startOfDay();
+        } catch (\Throwable $e) {
+            abort(404);
+        }
+
+        $attendance = Attendance::firstOrCreate([
+            'user_id'   => $user->id,
+            'work_date' => $day->toDateString(),
+        ]);
+
+        return redirect()->route('admin.attendances.show', $attendance->id);
     }
 
     public function attendanceCsv(Request $request, User $user)

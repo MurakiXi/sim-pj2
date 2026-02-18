@@ -93,7 +93,7 @@ class AdminAttendanceController extends Controller
                 ->values();
         }
 
-        while ($breakRows->count() < 2) {
+        while ($breakRows->count() < 1) {
             $breakRows->push((object) ['break_in_at' => null, 'break_out_at' => null]);
         }
 

@@ -3,7 +3,7 @@
 @section('title', '修正申請承認')
 
 @section('css')
-<link rel="stylesheet" href="{{ asset('css/admin-request.css') }}">
+<link rel="stylesheet" href="{{ asset('css/admin-request-show.css') }}">
 @endsection
 
 @section('content')
@@ -15,9 +15,15 @@
 @endif
 
 <table class="show__table">
+    <colgroup>
+        <col class="show__col-header">
+        <col class="show__col-from">
+        <col class="show__col-wave">
+        <col class="show__col-to">
+    </colgroup>
     <tr class="show__table-row">
         <th class="show__table-header">名前</th>
-        <td class="show__table-data" colspan="3">{{ $user->name }}</td>
+        <td class="show__table-data show__table-data--wide" colspan="3">{{ $user->name }}</td>
     </tr>
 
     <tr class="show__table-row">
@@ -34,32 +40,40 @@
         <td class="show__table-data">{{ $displayClockOutAt?->format('H:i') ?? '' }}</td>
     </tr>
 
-    @foreach($breakRows as $break)
+    @php
+    $displayBreakRows = collect($breakRows)->values();
+    $displayBreakRows->push((object)['break_in_at' => null, 'break_out_at' => null]);
+    @endphp
+
+    @foreach($displayBreakRows as $break)
     <tr class="show__table-row">
         <th class="show__table-header">{{ $loop->first ? '休憩' : '休憩'.$loop->iteration }}</th>
         <td class="show__table-data">{{ $break->break_in_at?->format('H:i') ?? '' }}</td>
-        <td class="show__table-wave">〜</td>
+        <td class="show__table-wave">
+            {{ ($break->break_in_at || $break->break_out_at) ? '〜' : '' }}
+        </td>
+
         <td class="show__table-data">{{ $break->break_out_at?->format('H:i') ?? '' }}</td>
     </tr>
     @endforeach
 
     <tr class="show__table-row">
         <th class="show__table-header">備考</th>
-        <td class="show__table-data" colspan="3">{{ $displayNote ?? '' }}</td>
+        <td class="show__table-note" colspan="3">{{ $displayNote ?? '' }}</td>
     </tr>
 </table>
 
 @if($canApprove)
-<div class="show__table-button-approve">
+<div class="show__table-button">
     <form method="POST" action="{{ route('admin.requests.approve', $scr->id) }}">
         @csrf
         @method('PATCH')
-        <button type="submit">承認</button>
+        <button class="show__table-button-approve" type="submit">承認</button>
     </form>
 </div>
 @elseif($isApproved)
-<div class="show__table-button-approved">
-    <button type="button" disabled>承認済み</button>
+<div class="show__table-button">
+    <button class="show__table-button-approved" type="button" disabled>承認済み</button>
 </div>
 @endif
 
