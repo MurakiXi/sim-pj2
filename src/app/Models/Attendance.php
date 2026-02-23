@@ -22,13 +22,6 @@ class Attendance extends Model
         return $this->hasMany(BreakTime::class);
     }
 
-    public function breakSeconds(): int
-    {
-        return $this->breakTimes
-            ->filter(fn(BreakTime $b) => !is_null($b->break_out_at))
-            ->sum(fn(BreakTime $b) => $b->break_in_at->diffInSeconds($b->break_out_at));
-    }
-
     public function workSeconds(): ?int
     {
         if (is_null($this->clock_in_at) || is_null($this->clock_out_at)) {
@@ -66,5 +59,20 @@ class Attendance extends Model
     public function stampCorrectionRequests()
     {
         return $this->hasMany(StampCorrectionRequest::class);
+    }
+
+    public function breakSeconds(): int
+    {
+        return $this->breakTimes
+            ->whereNotNull('break_out_at')
+            ->sum(fn($b) => $b->break_out_at->diffInSeconds($b->break_in_at));
+    }
+
+    public function breakLabel(): string
+    {
+        $sec = $this->breakSeconds();
+        $h = intdiv($sec, 3600);
+        $m = intdiv($sec % 3600, 60);
+        return sprintf('%d:%02d', $h, $m); // 0:30 形式
     }
 }

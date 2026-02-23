@@ -15,17 +15,24 @@ class AttendanceController extends Controller
     public function create(Request $request)
     {
         $user = $request->user();
-        $today = now()->toDateString();
+
+        $now = now();
+        $today = $now->toDateString();
+
         $attendance = Attendance::query()
             ->where('user_id', $user->id)
             ->where('work_date', $today)
             ->first();
+
         $workStatus = $this->determineStatus($attendance);
+
+        $youbi = ['日', '月', '火', '水', '木', '金', '土'][$now->dayOfWeek];
+
         return view('attendance.create', [
             'attendance' => $attendance,
             'workStatus' => $workStatus,
-            'todayLabel' => now()->format('Y年n月j日'),
-            'timeLabel' => now()->format('H:i')
+            'todayLabel' => $now->format('Y年n月j日') . "({$youbi})",
+            'timeLabel'  => $now->format('H:i'),
         ]);
     }
 
@@ -239,6 +246,7 @@ class AttendanceController extends Controller
         $attendances = Attendance::with(['breakTimes' => fn($q) => $q->orderBy('break_in_at')])
             ->where('user_id', $user->id)
             ->whereBetween('work_date', [$start->toDateString(), $end->toDateString()])
+            ->with('breakTimes')
             ->get();
 
         $attendanceByDate = $attendances->keyBy(fn($a) => $a->work_date->toDateString());
@@ -248,15 +256,20 @@ class AttendanceController extends Controller
             /** @var Attendance|null $a */
             $a = $attendanceByDate->get($d->toDateString());
 
+            $breakSec = $a?->breakSeconds() ?? 0;
+
             $rows->push([
-                'id'         => $a?->id,
-                'date'       => $d->format('m/d'),
+                'id'        => $a?->id,
+                'date'      => $d->format('m/d'),
                 'work_date' => $d->toDateString(),
-                'weekday'    => ['日', '月', '火', '水', '木', '金', '土'][$d->dayOfWeek],
-                'clock_in'   => $a?->clock_in_at?->format('H:i') ?? '',
-                'clock_out'  => $a?->clock_out_at?->format('H:i') ?? '',
-                'break'      => ($a && $a->clock_out_at) ? $a->breakDurationLabel() : '',
-                'work'       => ($a && $a->clock_out_at) ? $a->workDurationLabel() : '',
+                'weekday'   => ['日', '月', '火', '水', '木', '金', '土'][$d->dayOfWeek],
+                'clock_in'  => $a?->clock_in_at?->format('H:i') ?? '',
+                'clock_out' => $a?->clock_out_at?->format('H:i') ?? '',
+                'break'     => ($a && ($a->clock_out_at || $breakSec > 0))
+                    ? sprintf('%d:%02d', intdiv($breakSec, 3600), intdiv($breakSec % 3600, 60))
+                    : '',
+
+                'work'      => ($a && $a->clock_out_at) ? $a->workDurationLabel() : '',
             ]);
         }
 
