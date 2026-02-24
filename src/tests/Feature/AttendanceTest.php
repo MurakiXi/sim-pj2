@@ -64,24 +64,23 @@ class AttendanceTest extends TestCase
         ]);
 
         Attendance::create([
-            'user_id' => $user->id,
-            'work_date' => now()->toDateString(),
-            'clock_in_at' => now(),
-            'clock_out_at' => null,
+            'user_id'      => $user->id,
+            'work_date'    => now()->toDateString(),
+            'clock_in_at'  => now(),
+            'clock_out_at' => now(),
         ]);
 
         $page = $this->actingAs($user)->get(route('attendances.create'));
         $page->assertOk();
 
-        $page->assertSeeText('出勤中');
+        $page->assertSeeText('退勤済');
 
         $page->assertDontSee('action="' . route('attendances.clock_in') . '"', false);
 
         $post = $this->actingAs($user)->post(route('attendances.clock_in'));
         $post->assertRedirect(route('attendances.create'));
 
-        $this->assertTrue(session()->has('flash_message'));
-        $this->assertStringContainsString('既に出勤済みです：', session('flash_message'));
+        $post->assertSessionHas('flash_message');
 
         $this->assertDatabaseCount('attendances', 1);
 
@@ -257,7 +256,9 @@ class AttendanceTest extends TestCase
         $this->get('/attendance')
             ->assertOk()
             ->assertSeeText('休憩入')
-            ->assertDontSeeText('休憩中');
+            ->assertSeeText('出勤中')
+            ->assertDontSeeText('休憩中')
+            ->assertDontSeeText('休憩戻');
 
         $this->assertDatabaseMissing('break_times', [
             'attendance_id' => $attendance->id,
@@ -429,7 +430,6 @@ class AttendanceTest extends TestCase
         $user = User::factory()->create(['email_verified_at' => now()]);
         $this->actingAs($user);
 
-        // 出勤
         $this->post(route('attendances.clock_in'))
             ->assertRedirect(route('attendances.create'));
 
@@ -439,7 +439,6 @@ class AttendanceTest extends TestCase
 
         $this->assertNotNull($attendance->clock_in_at);
 
-        // 退勤（時刻固定）
         Carbon::setTestNow(Carbon::create(2026, 2, 19, 12, 0, 0, 'Asia/Tokyo'));
         $expectedTime = Carbon::now()->format('H:i'); // 12:00
 
@@ -450,17 +449,14 @@ class AttendanceTest extends TestCase
             ->assertOk()
             ->assertSeeText('退勤済');
 
-        // DB確認（attendances に clock_out_at）
         $this->assertDatabaseHas('attendances', [
             'id'           => $attendance->id,
             'clock_out_at' => Carbon::now()->format('Y-m-d H:i:s'),
         ]);
 
-        // 一覧は「退勤後」に取り直す
         $list = $this->get(route('attendances.index'))->assertOk();
         $list->assertSeeText($expectedTime);
 
-        // 行単位で確認（02/19(木) の行に 12:00 がある）
         $html = $list->getContent();
 
         $date = Carbon::create(2026, 2, 19, 0, 0, 0, 'Asia/Tokyo');

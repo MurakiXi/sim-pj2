@@ -76,30 +76,29 @@ class AttendanceRequest extends FormRequest
                 $bin  = $b['break_in_at']  ?? null;
                 $bout = $b['break_out_at'] ?? null;
 
-                if (!$bin && !$bout) continue;
-
-                if (!$bin || !$bout) {
-                    $v->errors()->add("breaks.$i.break_in_at", '休憩時間が不適切な値です');
-                    continue;
-                }
-
-                if (!$toMinutes($bin) || !$toMinutes($bout)) {
-                    continue;
-                }
-
                 $binMin  = $toMinutes($bin);
                 $boutMin = $toMinutes($bout);
 
-                if ($binMin === null || $boutMin === null || $binMin >= $boutMin) {
+                if ($binMin === null || $boutMin === null) {
+                    continue;
+                }
+
+                if ($binMin >= $boutMin) {
                     $v->errors()->add("breaks.$i.break_in_at", '休憩時間が不適切な値です');
                     continue;
                 }
 
                 if ($inMin !== null && $binMin < $inMin) {
                     $v->errors()->add("breaks.$i.break_in_at", '休憩時間が不適切な値です');
+                    continue;
                 }
-                if ($outMin !== null && $boutMin > $outMin) {
+                if ($outMin !== null && $binMin > $outMin) {
                     $v->errors()->add("breaks.$i.break_in_at", '休憩時間が不適切な値です');
+                    continue;
+                }
+
+                if ($outMin !== null && $boutMin > $outMin) {
+                    $v->errors()->add("breaks.$i.break_out_at", '休憩時間もしくは退勤時間が不適切な値です');
                 }
             }
         });
