@@ -16,6 +16,8 @@ class DatetimeTest extends TestCase
      * @return void
      */
 
+    use RefreshDatabase;
+
     public function test_clock_screen_shows_current_datetime_in_ui_format(): void
     {
         Carbon::setTestNow(Carbon::create(2026, 2, 19, 9, 5, 0, 'Asia/Tokyo'));

@@ -22,6 +22,7 @@ class DetailTest extends TestCase
      */
 
     use RefreshDatabase;
+
     public function test_detail_page_shows_logged_in_users_name(): void
     {
         Carbon::setTestNow(Carbon::create(2026, 2, 19, 9, 0, 0, 'Asia/Tokyo'));

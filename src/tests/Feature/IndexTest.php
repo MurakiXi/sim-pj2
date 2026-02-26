@@ -8,6 +8,9 @@ use Tests\TestCase;
 use Illuminate\Support\Carbon;
 use App\Models\User;
 use App\Models\Attendance;
+use App\Models\Admin;
+use Illuminate\Support\Facades\Hash;
+
 
 class IndexTest extends TestCase
 {
@@ -16,6 +19,9 @@ class IndexTest extends TestCase
      *
      * @return void
      */
+
+    use RefreshDatabase;
+
     private function dateLabel(string $ymd): string
     {
         $d = Carbon::createFromFormat('Y-m-d', $ymd, 'Asia/Tokyo');
@@ -302,6 +308,234 @@ class IndexTest extends TestCase
         $detail = $this->actingAs($user)->get($detailUrl)->assertOk();
         $detail->assertSeeText($attendance->work_date->format('Y年'));
         $detail->assertSeeText($attendance->work_date->format('n月j日'));
+
+        Carbon::setTestNow();
+    }
+
+    public function test_admin_attendance_list_shows_all_users_attendances_of_the_day(): void
+    {
+        Carbon::setTestNow(Carbon::create(2026, 2, 19, 9, 0, 0, 'Asia/Tokyo'));
+        $today = now()->toDateString();
+
+        $u1 = User::factory()->create([
+            'email_verified_at' => now(),
+            'name' => 'テスト 太郎',
+        ]);
+
+        $u2 = User::factory()->create([
+            'email_verified_at' => now(),
+            'name' => '試験 次郎',
+        ]);
+
+        $a1 = Attendance::create([
+            'user_id'      => $u1->id,
+            'work_date'    => $today,
+            'clock_in_at'  => Carbon::create(2026, 2, 19, 9, 0, 0, 'Asia/Tokyo'),
+            'clock_out_at' => Carbon::create(2026, 2, 19, 18, 0, 0, 'Asia/Tokyo'),
+        ]);
+
+        $a1->breakTimes()->create([
+            'break_in_at'  => Carbon::create(2026, 2, 19, 12, 0, 0, 'Asia/Tokyo'),
+            'break_out_at' => Carbon::create(2026, 2, 19, 13, 0, 0, 'Asia/Tokyo'),
+        ]);
+
+        $a2 = Attendance::create([
+            'user_id'      => $u2->id,
+            'work_date'    => $today,
+            'clock_in_at'  => Carbon::create(2026, 2, 19, 10, 0, 0, 'Asia/Tokyo'),
+            'clock_out_at' => Carbon::create(2026, 2, 19, 19, 0, 0, 'Asia/Tokyo'),
+        ]);
+
+        $a2->breakTimes()->create([
+            'break_in_at'  => Carbon::create(2026, 2, 19, 13, 0, 0, 'Asia/Tokyo'),
+            'break_out_at' => Carbon::create(2026, 2, 19, 13, 30, 0, 'Asia/Tokyo'),
+        ]);
+
+        Attendance::create([
+            'user_id'      => $u1->id,
+            'work_date'    => '2026-02-18',
+            'clock_in_at'  => Carbon::create(2026, 2, 18, 1, 11, 0, 'Asia/Tokyo'),
+            'clock_out_at' => Carbon::create(2026, 2, 18, 2, 22, 0, 'Asia/Tokyo'),
+        ]);
+
+        $admin = Admin::create([
+            'name'     => '管理者',
+            'email'    => 'admin@example.com',
+            'password' => Hash::make('password'),
+        ]);
+
+        $res = $this->actingAs($admin, 'admin')
+            ->get(route('admin.attendances.index', ['date' => $today]))
+            ->assertOk();
+
+        $html = $res->getContent();
+
+        $detailUrl1 = route('admin.attendances.show', $a1->id);
+        $this->assertMatchesRegularExpression(
+            '/<tr class="index__table-row">[\s\S]*?'
+                . preg_quote('テスト 太郎', '/')
+                . '[\s\S]*?'
+                . preg_quote('09:00', '/')
+                . '[\s\S]*?'
+                . preg_quote('18:00', '/')
+                . '[\s\S]*?'
+                . preg_quote('1:00', '/')
+                . '[\s\S]*?'
+                . preg_quote('8:00', '/')
+                . '[\s\S]*?'
+                . preg_quote($detailUrl1, '/')
+                . '[\s\S]*?<\/tr>/us',
+            $html
+        );
+
+        $detailUrl2 = route('admin.attendances.show', $a2->id);
+        $this->assertMatchesRegularExpression(
+            '/<tr class="index__table-row">[\s\S]*?'
+                . preg_quote('試験 次郎', '/')
+                . '[\s\S]*?'
+                . preg_quote('10:00', '/')
+                . '[\s\S]*?'
+                . preg_quote('19:00', '/')
+                . '[\s\S]*?'
+                . preg_quote('0:30', '/')
+                . '[\s\S]*?'
+                . preg_quote('8:30', '/')
+                . '[\s\S]*?'
+                . preg_quote($detailUrl2, '/')
+                . '[\s\S]*?<\/tr>/us',
+            $html
+        );
+
+        $this->assertStringNotContainsString('01:11', $html);
+        $this->assertStringNotContainsString('02:22', $html);
+
+        Carbon::setTestNow();
+    }
+
+    public function test_admin_attendance_list_shows_today_date_on_initial_visit(): void
+    {
+        Carbon::setTestNow(Carbon::create(2026, 2, 19, 9, 0, 0, 'Asia/Tokyo'));
+
+        $admin = Admin::create([
+            'name'     => '管理者',
+            'email'    => 'admin@example.com',
+            'password' => Hash::make('password'),
+        ]);
+
+        $res = $this->actingAs($admin, 'admin')
+            ->get(route('admin.attendances.index'))
+            ->assertOk();
+
+        $res->assertSeeText(now()->format('Y年n月j日') . 'の勤怠');
+
+        $res->assertSeeText(now()->format('Y/m/d'));
+
+        Carbon::setTestNow();
+    }
+
+    public function test_prev_day_link_shows_previous_day_attendance_values(): void
+    {
+        Carbon::setTestNow(Carbon::create(2026, 2, 19, 9, 0, 0, 'Asia/Tokyo'));
+
+        $admin = Admin::create([
+            'name'     => '管理者',
+            'email'    => 'admin@example.com',
+            'password' => Hash::make('password'),
+        ]);
+
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+            'name' => 'テスト 太郎',
+        ]);
+
+        Attendance::create([
+            'user_id'      => $user->id,
+            'work_date'    => '2026-02-18',
+            'clock_in_at'  => Carbon::create(2026, 2, 18, 9, 0, 0, 'Asia/Tokyo'),
+            'clock_out_at' => Carbon::create(2026, 2, 18, 18, 0, 0, 'Asia/Tokyo'),
+        ]);
+
+        Attendance::create([
+            'user_id'      => $user->id,
+            'work_date'    => '2026-02-19',
+            'clock_in_at'  => Carbon::create(2026, 2, 19, 10, 0, 0, 'Asia/Tokyo'),
+            'clock_out_at' => Carbon::create(2026, 2, 19, 19, 0, 0, 'Asia/Tokyo'),
+        ]);
+
+        $todayRes = $this->actingAs($admin, 'admin')
+            ->get(route('admin.attendances.index'))
+            ->assertOk();
+
+        $todayRes->assertSeeText('テスト 太郎');
+        $todayRes->assertSeeText('10:00');
+        $todayRes->assertSeeText('19:00');
+
+        $prevDate = now()->copy()->subDay()->toDateString();
+        $prevHref = route('admin.attendances.index', ['date' => $prevDate]);
+
+        $prevRes = $this->actingAs($admin, 'admin')
+            ->get($prevHref)
+            ->assertOk();
+
+        $prevRes->assertSeeText(Carbon::parse($prevDate)->format('Y年n月j日') . 'の勤怠');
+
+        $prevRes->assertSeeText('テスト 太郎');
+        $prevRes->assertSeeText('09:00');
+        $prevRes->assertSeeText('18:00');
+
+        Carbon::setTestNow();
+    }
+
+    public function test_next_day_link_shows_next_day_attendance_values(): void
+    {
+        Carbon::setTestNow(Carbon::create(2026, 2, 19, 9, 0, 0, 'Asia/Tokyo'));
+
+        $admin = Admin::create([
+            'name'     => '管理者',
+            'email'    => 'admin@example.com',
+            'password' => Hash::make('password'),
+        ]);
+
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+            'name' => 'テスト 太郎',
+        ]);
+
+        Attendance::create([
+            'user_id'      => $user->id,
+            'work_date'    => '2026-02-20',
+            'clock_in_at'  => Carbon::create(2026, 2, 20, 9, 0, 0, 'Asia/Tokyo'),
+            'clock_out_at' => Carbon::create(2026, 2, 20, 18, 0, 0, 'Asia/Tokyo'),
+        ]);
+
+        Attendance::create([
+            'user_id'      => $user->id,
+            'work_date'    => '2026-02-19',
+            'clock_in_at'  => Carbon::create(2026, 2, 19, 10, 0, 0, 'Asia/Tokyo'),
+            'clock_out_at' => Carbon::create(2026, 2, 19, 19, 0, 0, 'Asia/Tokyo'),
+        ]);
+
+        $todayRes = $this->actingAs($admin, 'admin')
+            ->get(route('admin.attendances.index'))
+            ->assertOk();
+
+        $todayRes->assertSeeText('テスト 太郎');
+        $todayRes->assertSeeText('10:00');
+        $todayRes->assertSeeText('19:00');
+
+        $nextDate = now()->copy()->addDay()->toDateString(); // 2026-02-20
+        $nextHref = route('admin.attendances.index', ['date' => $nextDate]);
+
+        $todayRes->assertSee('href="' . e($nextHref) . '"', false);
+
+        $nextRes = $this->actingAs($admin, 'admin')
+            ->get($nextHref)
+            ->assertOk();
+
+        $nextRes->assertSeeText(Carbon::parse($nextDate)->format('Y年n月j日') . 'の勤怠');
+        $nextRes->assertSeeText('テスト 太郎');
+        $nextRes->assertSeeText('09:00');
+        $nextRes->assertSeeText('18:00');
 
         Carbon::setTestNow();
     }

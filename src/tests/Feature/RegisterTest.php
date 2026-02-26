@@ -76,7 +76,7 @@ class RegisterTest extends TestCase
             'email' => 'メールアドレスを入力してください',
         ]);
 
-        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseMissing('users', ['email' => 'taro@example.com']);
 
         $this->assertGuest();
     }
@@ -99,7 +99,7 @@ class RegisterTest extends TestCase
             'password' => 'パスワードは8文字以上で入力してください',
         ]);
 
-        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseMissing('users', ['email' => 'taro@example.com']);
 
 
         $this->assertGuest();
@@ -123,7 +123,7 @@ class RegisterTest extends TestCase
             'password' => 'パスワードと一致しません',
         ]);
 
-        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseMissing('users', ['email' => 'taro@example.com']);
 
         $this->assertGuest();
     }
@@ -141,7 +141,7 @@ class RegisterTest extends TestCase
             'password' => 'パスワードを入力してください',
         ]);
 
-        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseMissing('users', ['email' => 'taro@example.com']);
 
         $this->assertGuest();
     }

@@ -98,8 +98,14 @@ class AdminAttendanceRequest extends FormRequest
                 if ($inMin !== null && $binMin < $inMin) {
                     $v->errors()->add("breaks.$i.break_in_at", '休憩時間が不適切な値です');
                 }
-                if ($outMin !== null && $boutMin > $outMin) {
+
+                if ($outMin !== null && $binMin > $outMin) {
                     $v->errors()->add("breaks.$i.break_in_at", '休憩時間が不適切な値です');
+                    continue;
+                }
+
+                if ($outMin !== null && $boutMin > $outMin) {
+                    $v->errors()->add("breaks.$i.break_in_at", '休憩時間もしくは退勤時間が不適切な値です');
                 }
             }
         });
