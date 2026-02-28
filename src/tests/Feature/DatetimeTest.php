@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use Illuminate\Support\Carbon;
 use App\Models\User;
+use Symfony\Component\DomCrawler\Crawler;
 
 class DatetimeTest extends TestCase
 {
@@ -22,10 +23,6 @@ class DatetimeTest extends TestCase
     {
         Carbon::setTestNow(Carbon::create(2026, 2, 19, 9, 5, 0, 'Asia/Tokyo'));
 
-        $user = User::factory()->create([
-            'email_verified_at' => now(),
-        ]);
-
         /** @var \App\Models\User $user */
         $user = User::factory()->create([
             'email_verified_at' => now(),
@@ -35,11 +32,14 @@ class DatetimeTest extends TestCase
         $response->assertOk();
 
         $html = $response->getContent();
-        $now  = now();
+        $now  = now('Asia/Tokyo');
 
-        preg_match('/<div class="create__date-label">\s*([^<]+)\s*<\/div>/u', $html, $m);
-        $this->assertNotEmpty($m, 'create__date-label が見つかりません');
-        $dateText = trim($m[1]);
+        $crawler = new Crawler($html);
+
+        // date
+        $dateNode = $crawler->filter('.create__date-label');
+        $this->assertGreaterThan(0, $dateNode->count(), 'create__date-label が見つかりません');
+        $dateText = trim($dateNode->text());
 
         $this->assertMatchesRegularExpression(
             '/^\d{4}年\d{1,2}月\d{1,2}日\([日月火水木金土]\)$/u',
@@ -54,9 +54,10 @@ class DatetimeTest extends TestCase
         $this->assertSame((int)$now->day,   (int)$d[3]);
         $this->assertSame($youbi, $d[4]);
 
-        preg_match('/<div class="create__time-label">\s*([^<]+)\s*<\/div>/u', $html, $m2);
-        $this->assertNotEmpty($m2, 'create__time-label が見つかりません');
-        $timeText = trim($m2[1]);
+        // time
+        $timeNode = $crawler->filter('.create__time-label');
+        $this->assertGreaterThan(0, $timeNode->count(), 'create__time-label が見つかりません');
+        $timeText = trim($timeNode->text());
 
         $this->assertMatchesRegularExpression('/^\d{1,2}:\d{2}$/', $timeText);
 
