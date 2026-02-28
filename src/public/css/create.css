@@ -1,7 +1,25 @@
 .flash-message {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 80px;
     text-align: center;
     font-size: 24px;
     font-weight: bold;
+    padding: 10px 0;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease;
+}
+
+.flash-message.is-show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.flash-message:empty {
+    display: none;
 }
 
 .create__work-status {

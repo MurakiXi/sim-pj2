@@ -56,3 +56,8 @@
     color: #0d71e4;
     text-align: center;
 }
+
+.auth__error {
+    color: #ff5555;
+    font-weight: bold;
+}

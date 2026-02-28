@@ -1,0 +1,162 @@
+.index__title {
+    font-size: 24px;
+    font-weight: bold;
+    padding-left: 10px;
+    margin: 50px auto 25px;
+    width: 800px;
+}
+
+.index__header {
+    width: 800px;
+    display: flex;
+    justify-content: left;
+    margin: 0 auto;
+    border-bottom: 1px solid #000;
+}
+
+.index__header a.is-active {
+    font-weight: bold;
+}
+
+.index__header-inner a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.index__header-inner {
+    color: #000;
+    margin: 0 0 10px 50px;
+}
+
+.index__date-nav a {
+    color: inherit;
+}
+
+.index__date-nav {
+    color: #666;
+    padding: 10px 20px;
+}
+
+.index__date-label {
+    padding: 10px;
+    font-weight: bold;
+}
+
+.index__table {
+    width: 800px;
+    background: #fff;
+    color: #666;
+    margin: 40px auto;
+    border-radius: 10px;
+    border-collapse: collapse;
+    border: none;
+    table-layout: fixed;
+    overflow: hidden;
+}
+
+.index__table th:nth-child(1),
+.index__table td:nth-child(1) {
+    width: 120px;
+    text-align: left;
+    padding-left: 50px;
+    white-space: nowrap;
+}
+
+.index__table th:nth-child(6),
+.index__table td:nth-child(6) {
+    width: 110px;
+    text-align: right;
+    padding-right: 80px;
+    white-space: nowrap;
+}
+
+.index__table th,
+.index__table td {
+    border: none;
+}
+
+.index__table thead th {
+    border-bottom: 1px solid #ddd;
+}
+
+.index__table tbody tr:not(:last-child) td {
+    border-bottom: 1px solid #ddd;
+}
+
+.index__table tbody tr:not(:last-child) th {
+    border-bottom: 3px solid #ddd;
+}
+
+.index__table-item-detail a {
+    color: inherit;
+}
+
+.index__table-item-detail {
+    color: #000;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.index__table-row-header {
+    height: 30px;
+}
+
+.index__table-header {
+    color: #666;
+}
+
+.index__table-row {
+    height: 40px;
+}
+
+
+.index__table-item {
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.index__date-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.index__date-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: #666;
+}
+
+.index__date-trigger:focus-visible {
+    outline: 2px solid #999;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+.index__date-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.index__date-text {
+    font-weight: bold;
+}
+
+.index__date-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}

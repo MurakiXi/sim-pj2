@@ -11,15 +11,18 @@
 <div class="index__title">申請一覧</div>
 
 <div class="index__header">
-    <a href="{{ route('stamp_correction_requests.index', ['status' => 'awaiting_approval']) }}"
-        class="{{ ($status ?? '') === 'awaiting_approval' ? 'is-active' : '' }}">
-        承認待ち
-    </a>
-
-    <a href="{{ route('stamp_correction_requests.index', ['status' => 'approved']) }}"
-        class="{{ ($status ?? '') === 'approved' ? 'is-active' : '' }}">
-        承認済み
-    </a>
+    <div class="index__header-inner">
+        <a href="{{ route('stamp_correction_requests.index', ['status' => 'awaiting_approval']) }}"
+            class="{{ ($status ?? '') === 'awaiting_approval' ? 'is-active' : '' }}">
+            承認待ち
+        </a>
+    </div>
+    <div class="index__header-inner">
+        <a href="{{ route('stamp_correction_requests.index', ['status' => 'approved']) }}"
+            class="{{ ($status ?? '') === 'approved' ? 'is-active' : '' }}">
+            承認済み
+        </a>
+    </div>
 </div>
 
 <table class="index__table">
@@ -42,7 +45,7 @@
         <td class="index__table-item">{{ $req->requested_note }}</td>
         <td class="index__table-item">{{ optional($req->created_at)->format('Y/m/d') }}</td>
         <td class="index__table-item">
-            <a href="{{ route('attendances.show', $req->attendance->id) }}">詳細</a>
+            <a class="index__table-item-detail" href="{{ route('attendances.show', $req->attendance->id) }}">詳細</a>
         </td>
     </tr>
     @endforeach

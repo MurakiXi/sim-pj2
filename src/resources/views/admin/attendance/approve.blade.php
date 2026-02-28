@@ -7,7 +7,18 @@
 @endsection
 
 @section('content')
-
+<div id="flash-message" class="flash-message">
+    @if (session('flash_message'))
+    {{ session('flash_message') }}
+    <script>
+        setTimeout(() => {
+            const el = document.getElementById('flash-message');
+            if (el) el.style.display = 'none';
+        }, 2000);
+    </script>
+    @endif
+    　
+</div>
 <div class="show__title">勤怠詳細</div>
 
 <table class="show__table">

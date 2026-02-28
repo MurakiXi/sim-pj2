@@ -8,15 +8,21 @@
 @endsection
 
 @section('content')
-@if (session('flash_message'))
 <div id="flash-message" class="flash-message">
     {{ session('flash_message') }}
 </div>
+@if (session('flash_message'))
 <script>
-    setTimeout(() => {
+    document.addEventListener('DOMContentLoaded', () => {
         const el = document.getElementById('flash-message');
-        if (el) el.style.display = 'none';
-    }, 3000);
+        if (!el) return;
+
+        el.classList.add('is-show');
+
+        setTimeout(() => {
+            el.classList.remove('is-show');
+        }, 2000);
+    });
 </script>
 @endif
 
@@ -26,8 +32,8 @@
 
 
 <div id="clock" data-server-now="{{ now()->timestamp * 1000 }}">
-    <div class="create__date-label">{{ $todayLabel }}</div>
-    <div class="create__time-label">{{ $timeLabel }}</div>
+    <div id="today-label" class="create__date-label">{{ $todayLabel }}</div>
+    <div id="time-label" class="create__time-label">{{ $timeLabel }}</div>
 </div>
 
 <script src="{{ asset('js/time.js') }}" defer></script>

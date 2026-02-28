@@ -1,7 +1,25 @@
 .flash-message {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 80px;
     text-align: center;
     font-size: 24px;
     font-weight: bold;
+    padding: 10px 0;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease;
+}
+
+.flash-message.is-show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.flash-message:empty {
+    display: none;
 }
 
 .show__title {
@@ -65,8 +83,15 @@
     font-weight: bold;
 }
 
-.show__table-row {
+.show__table-row>th,
+.show__table-row>td {
     height: 75px;
+    vertical-align: middle;
+}
+
+.show__table-row--note>th,
+.show__table-row--note>td {
+    height: auto;
 }
 
 .show__table-item {
@@ -89,8 +114,8 @@
     text-overflow: ellipsis;
 }
 
-.show__table-data-note {
-    padding-right: 85px;
+.show__table-data--note {
+    padding: 0 8px;
 }
 
 .show__table-note {
@@ -130,7 +155,74 @@
     border-radius: 5px;
 }
 
-.show__table td:last-child {
-    padding-right: 150px;
+.show__table-data--with-error {
+    padding-right: 16px;
+    color: #ff5555
+}
 
+.show__field-with-error {
+    --field-col: 70px;
+    --error-col: 1fr;
+    display: grid;
+    grid-template-columns: var(--field-col) var(--error-col);
+    column-gap: 16px;
+    align-items: center;
+}
+
+.show__error-inline {
+    margin: 0;
+    text-align: left;
+    line-height: 1.2;
+    color: #ff5555
+}
+
+.show__table-data--md {
+    padding-right: 240px;
+}
+
+.show__field-with-error--textarea .show__table-note {
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.show__field-with-error--textarea .show__error-inline {
+    align-self: center;
+}
+
+.show__note-layout {
+    --note-left: 12px;
+    --note-width: 300px;
+    --note-gap: 16px;
+
+    display: grid;
+    grid-template-columns: var(--note-left) var(--note-width) minmax(0, 1fr);
+    column-gap: var(--note-gap);
+    align-items: center;
+    padding: 15px 0;
+}
+
+.show__note-layout .show__table-note {
+    grid-column: 2;
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.show__note-layout .show__error-slot {
+    grid-column: 3;
+    /* 右列 */
+    display: block;
+    justify-self: start;
+}
+
+.show__note-layout .show__error-slot::before {
+    content: none;
+}
+
+.show__note-layout .show__error-inline {
+    margin: 0;
+    text-align: left;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
 }

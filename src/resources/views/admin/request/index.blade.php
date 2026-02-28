@@ -7,7 +7,18 @@
 @endsection
 
 @section('content')
-
+<div id="flash-message" class="flash-message">
+    @if (session('flash_message'))
+    {{ session('flash_message') }}
+    <script>
+        setTimeout(() => {
+            const el = document.getElementById('flash-message');
+            if (el) el.style.display = 'none';
+        }, 2000);
+    </script>
+    @endif
+    　
+</div>
 <div class="index__title">申請一覧</div>
 
 <div class="index__header">

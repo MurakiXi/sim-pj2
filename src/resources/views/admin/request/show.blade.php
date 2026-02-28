@@ -7,12 +7,25 @@
 @endsection
 
 @section('content')
+<div id="flash-message" class="flash-message">
+    {{ session('flash_message') }}
+</div>
+@if (session('flash_message'))
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const el = document.getElementById('flash-message');
+        if (!el) return;
+
+        el.classList.add('is-show');
+
+        setTimeout(() => {
+            el.classList.remove('is-show');
+        }, 2000);
+    });
+</script>
+@endif
 
 <div class="show__title">勤怠詳細</div>
-
-@if (session('flash_message'))
-<p class="show__flash">{{ session('flash_message') }}</p>
-@endif
 
 <table class="show__table">
     <colgroup>
