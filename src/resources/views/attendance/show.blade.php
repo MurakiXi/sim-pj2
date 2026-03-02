@@ -48,7 +48,7 @@
 
             <td class="show__table-data show__table-data--field">
                 <input type="text" class="show__table-input" name="clock_in_at"
-                    value="{{ old('clock_in_at', $attendance->clock_in_at?->format('H:i') ?? '') }}"
+                    value="{{ old('clock_in_at', $displayClockIn?->format('H:i') ?? '') }}"
                     @disabled($hasAwaitingApproval)>
             </td>
 
@@ -61,9 +61,8 @@
 
                 <div class="show__field-with-error">
                     <input type="text" class="show__table-input" name="clock_out_at"
-                        value="{{ old('clock_out_at', $attendance->clock_out_at?->format('H:i') ?? '') }}"
+                        value="{{ old('clock_out_at', $displayClockOut?->format('H:i') ?? '') }}"
                         @disabled($hasAwaitingApproval)>
-
                     @if($clockError)
                     <p class="form__error show__error-inline">{{ $clockError }}</p>
                     @endif
@@ -112,8 +111,7 @@
 
             <td class="show__table-data show__table-data--note" colspan="3">
                 <div class="show__note-layout">
-                    <textarea name="note" class="show__table-note" @disabled($hasAwaitingApproval)>{{ old('note', $attendance->note) }}</textarea>
-
+                    <textarea name="note" class="show__table-note" @disabled($hasAwaitingApproval)>{{ old('note', $displayNote) }}</textarea>
                     @error('note')
                     <div class="show__error-slot">
                         <p class="form__error show__error-inline">{{ $message }}</p>

@@ -291,8 +291,6 @@ class AttendanceController extends Controller
             ->where('user_id', $user->id)
             ->firstOrFail();
 
-        $breakRows = $attendance->breakTimes->concat([new BreakTime()]);
-
         $pending = $attendance->stampCorrectionRequests()
             ->where('status', 'awaiting_approval')
             ->latest('id')
@@ -300,16 +298,45 @@ class AttendanceController extends Controller
 
         $hasAwaitingApproval = (bool) $pending;
 
+        if ($hasAwaitingApproval) {
+
+            $displayClockIn  = $pending->requested_clock_in_at;
+            $displayClockOut = $pending->requested_clock_out_at;
+            $displayNote     = $pending->requested_note;
+
+
+            $requestedBreaks = $pending->requested_breaks ?? [];
+
+            $breakRows = collect($requestedBreaks)->map(function ($b) {
+                $bt = new BreakTime();
+
+                $bt->break_in_at  = !empty($b['break_in_at'])  ? Carbon::parse($b['break_in_at'])  : null;
+                $bt->break_out_at = !empty($b['break_out_at']) ? Carbon::parse($b['break_out_at']) : null;
+
+                return $bt;
+            })->concat([new BreakTime()]);
+        } else {
+            $displayClockIn  = $attendance->clock_in_at;
+            $displayClockOut = $attendance->clock_out_at;
+            $displayNote     = $attendance->note ?? '';
+
+            $breakRows = $attendance->breakTimes->concat([new BreakTime()]);
+        }
+
         return view('attendance.show', [
-            'user'       => $user,
+            'user' => $user,
             'attendance' => $attendance,
-            'yearLabel'  => $attendance->work_date->format('Y年'),
-            'mdLabel'    => $attendance->work_date->format('n月j日'),
-            'clockIn'    => $attendance->clock_in_at?->format('H:i') ?? '',
-            'clockOut'   => $attendance->clock_out_at?->format('H:i') ?? '',
-            'breakRows'  => $breakRows,
-            'note'       => $attendance->note ?? '',
-            'hasAwaitingApproval' => $hasAwaitingApproval
+
+            'yearLabel' => $attendance->work_date->format('Y年'),
+            'mdLabel'   => $attendance->work_date->format('n月j日'),
+
+            // ★Blade側は以後これを見る
+            'displayClockIn'  => $displayClockIn,
+            'displayClockOut' => $displayClockOut,
+            'displayNote'     => $displayNote,
+            'breakRows'       => $breakRows,
+
+            'hasAwaitingApproval' => $hasAwaitingApproval,
         ]);
     }
 

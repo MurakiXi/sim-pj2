@@ -95,6 +95,6 @@ class StampCorrectionController extends Controller
             $scr->save();
         });
 
-        return redirect()->route('stamp_correction_request.list', ['status' => 'awaiting_approval']);
+        return redirect()->route('stamp_correction_requests.index', ['status' => 'awaiting_approval']);
     }
 }
