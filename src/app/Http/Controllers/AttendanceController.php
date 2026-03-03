@@ -330,7 +330,6 @@ class AttendanceController extends Controller
             'yearLabel' => $attendance->work_date->format('Y年'),
             'mdLabel'   => $attendance->work_date->format('n月j日'),
 
-            // ★Blade側は以後これを見る
             'displayClockIn'  => $displayClockIn,
             'displayClockOut' => $displayClockOut,
             'displayNote'     => $displayNote,

@@ -80,8 +80,8 @@ class AdminAttendanceController extends Controller
         if ($pending) {
             $breakRows = collect($pending->requested_breaks ?? [])
                 ->map(fn($b) => (object) [
-                    'break_in_at'  => Carbon::parse($b['break_in_at']),
-                    'break_out_at' => Carbon::parse($b['break_out_at']),
+                    'break_in_at'  => !empty($b['break_in_at'])  ? Carbon::parse($b['break_in_at'])  : null,
+                    'break_out_at' => !empty($b['break_out_at']) ? Carbon::parse($b['break_out_at']) : null,
                 ])
                 ->values();
         } else {
@@ -93,7 +93,9 @@ class AdminAttendanceController extends Controller
                 ->values();
         }
 
-        while ($breakRows->count() < 1) {
+        $neededCount = max($breakRows->count() + 1, 1);
+
+        while ($breakRows->count() < $neededCount) {
             $breakRows->push((object) ['break_in_at' => null, 'break_out_at' => null]);
         }
 

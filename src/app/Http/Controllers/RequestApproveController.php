@@ -118,7 +118,7 @@ class RequestApproveController extends Controller
         });
 
         return redirect()
-            ->route('admin.requests.show', $id)
+            ->route('stamp_correction_requests.index', ['tab' => 'awaiting'])
             ->with('flash_message', '承認しました');
     }
 }
