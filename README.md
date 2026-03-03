@@ -103,7 +103,7 @@ password: adminpass
 
 ※ユーザー登録後はMailhogで認証メールを開き認証リンクをクリックする必要あり
 
-※※Seeder作成ユーザーはemail_verified_at済みなので不要
+※Seeder作成ユーザーはemail_verified_at済みなので不要
 
 ### 6.URL一覧
 
@@ -119,7 +119,7 @@ Mailhog: http://localhost:8025
 
 ## テスト実行（重要：stamp_test DB）
 
-テストは src/.env.testing(DB_DATABASE=stamp_test)を参照します。DBを作成してください。
+テストは src/.env.testing（DB_DATABASE=stamp_test）を参照します。DBを作成してください。
 
 ```bash
 docker compose exec mysql mysql -uroot -proot -e "CREATE DATABASE IF NOT EXISTS stamp_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
@@ -137,9 +137,9 @@ docker compose exec php vendor/bin/phpunit
 docker compose exec php php artisan test
 ```
 
-※ テストは src/.env.testing（DB_DATABASE=stamp_test, DB_USERNAME=root, DB_PASSWORD=root）を参照
-
 ---
+
+
 
 ## テストにおけるエラーメッセージ文言の扱い
 
@@ -148,3 +148,12 @@ docker compose exec php php artisan test
 実装は要件シート(FN029)の記載に沿って行い、PHPUnitテストでは文言差分による不必要な失敗を避けるため、該当箇所は正規表現で双方の文言を許容する形で検証。
 
 (「出勤時間が不適切な値です」/「出勤時間もしくは退勤時間が不適切な値です」)
+
+
+
+
+## テーブル仕様書・基本設計書
+
+テーブル仕様書(含ER図)：docs/table_spec.xlsx
+
+基本設計書：docs/basic_design.xlsx」
