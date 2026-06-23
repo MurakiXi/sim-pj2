@@ -103,7 +103,7 @@ password: adminpass
 
 ※ユーザー登録後はMailhogで認証メールを開き認証リンクをクリックする必要あり
 
-※※Seeder作成ユーザーはemail_verified_at済みなので不要
+※Seeder作成ユーザーはemail_verified_at済みなので不要
 
 ### 6.URL一覧
 
@@ -119,7 +119,7 @@ Mailhog: http://localhost:8025
 
 ## テスト実行（重要：stamp_test DB）
 
-テストは src/.env.testing(DB_DATABASE=stamp_test)を参照します。DBを作成してください。
+テストは src/.env.testing（DB_DATABASE=stamp_test）を参照します。DBを作成してください。
 
 ```bash
 docker compose exec mysql mysql -uroot -proot -e "CREATE DATABASE IF NOT EXISTS stamp_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
@@ -136,8 +136,6 @@ docker compose exec php vendor/bin/phpunit
 ```bash
 docker compose exec php php artisan test
 ```
-
-※ テストは src/.env.testing（DB_DATABASE=stamp_test, DB_USERNAME=root, DB_PASSWORD=root）を参照
 
 ---
 
